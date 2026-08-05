@@ -1,0 +1,508 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>V-Flux — 당신의 자산, 더 똑똑하게 흐르게</title>
+<style>
+  :root {
+    --primary: #6C5CE7;
+    --primary-deep: #2D1B8F;
+    --primary-dark: #1E1560;
+    --accent: #7B6CFF;
+    --ink: #1c1c2e;
+    --ink-soft: #5a5a72;
+    --expense: #2563EB;
+    --income: #E11D48;
+    --bg: #F6F5FB;
+    --card: #FFFFFF;
+    --radius: 20px;
+  }
+  * { margin: 0; padding: 0; box-sizing: border-box; }
+  html { scroll-behavior: smooth; }
+  body {
+    font-family: "Pretendard", "Noto Sans KR", -apple-system, BlinkMacSystemFont, "Segoe UI", "Malgun Gothic", sans-serif;
+    background: var(--bg);
+    color: var(--ink);
+    line-height: 1.6;
+    overflow-x: hidden;
+  }
+
+  /* ───────────── Hero ───────────── */
+  .hero {
+    position: relative;
+    background: linear-gradient(150deg, var(--primary-dark) 0%, var(--primary-deep) 45%, var(--primary) 100%);
+    color: #fff;
+    padding: 72px 24px 140px;
+    overflow: hidden;
+  }
+  .hero::before, .hero::after {
+    content: "";
+    position: absolute;
+    border-radius: 50%;
+    background: rgba(255, 255, 255, 0.06);
+    pointer-events: none;
+  }
+  .hero::before { width: 480px; height: 480px; top: -180px; right: -120px; }
+  .hero::after  { width: 320px; height: 320px; bottom: -140px; left: -100px; }
+  .hero-inner {
+    max-width: 1040px;
+    margin: 0 auto;
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    gap: 48px;
+    flex-wrap: wrap;
+    position: relative;
+    z-index: 1;
+  }
+  .hero-copy { flex: 1 1 380px; }
+  .hero-logo {
+    font-size: 52px;
+    font-weight: 800;
+    letter-spacing: 10px;
+    margin-bottom: 4px;
+  }
+  .hero-logo span { color: #B9AFFF; }
+  .hero-tagline {
+    font-size: 22px;
+    font-weight: 600;
+    letter-spacing: 4px;
+    opacity: 0.92;
+    margin-bottom: 20px;
+  }
+  .hero-desc {
+    font-size: 15.5px;
+    opacity: 0.78;
+    max-width: 420px;
+    margin-bottom: 28px;
+    word-break: keep-all;
+  }
+  .hero-badges { display: flex; gap: 10px; flex-wrap: wrap; }
+  .badge {
+    padding: 8px 16px;
+    border-radius: 999px;
+    background: rgba(255, 255, 255, 0.12);
+    border: 1px solid rgba(255, 255, 255, 0.25);
+    font-size: 13px;
+    font-weight: 600;
+    backdrop-filter: blur(4px);
+    transition: transform 0.25s ease, background 0.25s ease;
+    cursor: default;
+  }
+  .badge:hover { transform: translateY(-3px); background: rgba(255, 255, 255, 0.22); }
+
+  /* ── CSS 폰 목업 ── */
+  .phone-wrap { flex: 0 0 auto; perspective: 1200px; }
+  .phone {
+    width: 280px;
+    border-radius: 36px;
+    background: #0f0c29;
+    padding: 12px;
+    box-shadow: 0 40px 80px rgba(10, 5, 60, 0.45);
+    transform: rotate(3deg);
+    transition: transform 0.5s cubic-bezier(0.22, 1, 0.36, 1), box-shadow 0.5s ease;
+  }
+  .phone:hover {
+    transform: rotate(0deg) translateY(-10px) rotateY(-6deg);
+    box-shadow: 0 56px 100px rgba(10, 5, 60, 0.55);
+  }
+  .screen {
+    border-radius: 26px;
+    overflow: hidden;
+    background: var(--bg);
+    font-size: 12px;
+  }
+  .screen-header {
+    background: linear-gradient(135deg, var(--primary-deep), var(--primary));
+    color: #fff;
+    padding: 18px 16px 14px;
+  }
+  .screen-header .t { font-size: 16px; font-weight: 800; }
+  .screen-header .s { font-size: 10px; opacity: 0.8; }
+  .screen-body { padding: 12px; }
+  .month-card {
+    background: #fff;
+    border-radius: 14px;
+    padding: 10px 12px;
+    display: flex;
+    justify-content: space-between;
+    margin-bottom: 10px;
+    box-shadow: 0 4px 14px rgba(30, 20, 90, 0.06);
+  }
+  .month-card div { text-align: center; }
+  .month-card .lb { font-size: 9px; color: var(--ink-soft); }
+  .month-card .vl { font-size: 12px; font-weight: 800; }
+  .vl.minus { color: var(--expense); }
+  .vl.plus  { color: var(--income); }
+  .entry {
+    background: #fff;
+    border-radius: 12px;
+    padding: 9px 12px;
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    margin-bottom: 8px;
+    box-shadow: 0 3px 10px rgba(30, 20, 90, 0.05);
+    transition: transform 0.25s ease;
+  }
+  .entry:hover { transform: translateX(4px); }
+  .chip {
+    font-size: 9px;
+    font-weight: 700;
+    padding: 2px 8px;
+    border-radius: 999px;
+    flex-shrink: 0;
+  }
+  .chip.out { background: #E8F0FE; color: var(--expense); }
+  .chip.in  { background: #FDE8EE; color: var(--income); }
+  .entry .name { flex: 1; font-weight: 700; font-size: 11px; }
+  .entry .name small { display: block; font-weight: 400; color: var(--ink-soft); font-size: 9px; }
+  .entry .amt { font-weight: 800; font-size: 11px; }
+  .amt.minus { color: var(--expense); }
+  .amt.plus  { color: var(--income); }
+  .fab {
+    width: 40px; height: 40px;
+    margin: 4px 4px 10px auto;
+    border-radius: 50%;
+    background: var(--primary-deep);
+    color: #fff;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-size: 20px;
+    font-weight: 700;
+    box-shadow: 0 8px 18px rgba(45, 27, 143, 0.4);
+  }
+
+  /* ───────────── 공통 섹션 ───────────── */
+  section { padding: 84px 24px; }
+  .section-inner { max-width: 1040px; margin: 0 auto; }
+  .section-title {
+    text-align: center;
+    font-size: 32px;
+    font-weight: 800;
+    margin-bottom: 10px;
+    word-break: keep-all;
+  }
+  .section-sub {
+    text-align: center;
+    font-size: 16px;
+    color: var(--ink-soft);
+    margin-bottom: 52px;
+    word-break: keep-all;
+  }
+  .section-title .hl { color: var(--primary); }
+
+  /* ───────────── 주요특징 ───────────── */
+  .features {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
+    gap: 22px;
+  }
+  .feature {
+    background: var(--card);
+    border-radius: var(--radius);
+    padding: 32px 28px;
+    box-shadow: 0 6px 24px rgba(30, 20, 90, 0.06);
+    border: 1px solid rgba(108, 92, 231, 0.08);
+    transition: transform 0.35s cubic-bezier(0.22, 1, 0.36, 1), box-shadow 0.35s ease, border-color 0.35s ease;
+    position: relative;
+    overflow: hidden;
+  }
+  .feature::after {
+    content: "";
+    position: absolute;
+    inset: 0;
+    background: linear-gradient(135deg, rgba(108, 92, 231, 0.05), rgba(123, 108, 255, 0));
+    opacity: 0;
+    transition: opacity 0.35s ease;
+    pointer-events: none;
+  }
+  .feature:hover {
+    transform: translateY(-8px);
+    box-shadow: 0 20px 44px rgba(45, 27, 143, 0.16);
+    border-color: rgba(108, 92, 231, 0.3);
+  }
+  .feature:hover::after { opacity: 1; }
+  .feature-icon {
+    width: 56px; height: 56px;
+    border-radius: 16px;
+    background: linear-gradient(135deg, #EFEBFF, #E2DBFF);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-size: 28px;
+    margin-bottom: 18px;
+    transition: transform 0.35s cubic-bezier(0.34, 1.56, 0.64, 1);
+  }
+  .feature:hover .feature-icon { transform: scale(1.15) rotate(-6deg); }
+  .feature h3 { font-size: 18px; font-weight: 800; margin-bottom: 8px; }
+  .feature p {
+    font-size: 14px;
+    color: var(--ink-soft);
+    word-break: keep-all;
+  }
+  .feature .tag {
+    display: inline-block;
+    margin-top: 14px;
+    font-size: 11.5px;
+    font-weight: 700;
+    color: var(--primary);
+    background: rgba(108, 92, 231, 0.1);
+    padding: 4px 10px;
+    border-radius: 999px;
+  }
+
+  /* ───────────── 간단 가이드 ───────────── */
+  .guide { background: #fff; }
+  .steps {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(220px, 1fr));
+    gap: 20px;
+    counter-reset: step;
+  }
+  .step {
+    background: var(--bg);
+    border-radius: var(--radius);
+    padding: 28px 24px;
+    position: relative;
+    transition: transform 0.3s ease, background 0.3s ease;
+  }
+  .step:hover { transform: translateY(-6px); background: #EFEBFF; }
+  .step-num {
+    counter-increment: step;
+    width: 36px; height: 36px;
+    border-radius: 50%;
+    background: var(--primary);
+    color: #fff;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-weight: 800;
+    font-size: 15px;
+    margin-bottom: 16px;
+    transition: transform 0.3s cubic-bezier(0.34, 1.56, 0.64, 1);
+  }
+  .step-num::before { content: counter(step); }
+  .step:hover .step-num { transform: scale(1.2); }
+  .step h4 { font-size: 16px; font-weight: 800; margin-bottom: 6px; }
+  .step p { font-size: 13.5px; color: var(--ink-soft); word-break: keep-all; }
+
+  /* ───────────── CTA ───────────── */
+  .cta {
+    background: linear-gradient(135deg, var(--primary-deep), var(--primary));
+    color: #fff;
+    text-align: center;
+    border-radius: 28px;
+    max-width: 1040px;
+    margin: 0 auto;
+    padding: 64px 32px;
+    position: relative;
+    overflow: hidden;
+  }
+  .cta::before {
+    content: "";
+    position: absolute;
+    width: 360px; height: 360px;
+    border-radius: 50%;
+    background: rgba(255, 255, 255, 0.07);
+    top: -160px; right: -80px;
+  }
+  .cta h2 { font-size: 28px; font-weight: 800; margin-bottom: 10px; word-break: keep-all; }
+  .cta p { opacity: 0.85; margin-bottom: 28px; font-size: 15px; word-break: keep-all; }
+  .cta-btn {
+    display: inline-block;
+    background: #fff;
+    color: var(--primary-deep);
+    font-weight: 800;
+    font-size: 16px;
+    padding: 14px 40px;
+    border-radius: 999px;
+    text-decoration: none;
+    transition: transform 0.3s cubic-bezier(0.34, 1.56, 0.64, 1), box-shadow 0.3s ease;
+    position: relative;
+    z-index: 1;
+  }
+  .cta-btn:hover {
+    transform: translateY(-4px) scale(1.04);
+    box-shadow: 0 16px 34px rgba(0, 0, 0, 0.28);
+  }
+
+  footer {
+    text-align: center;
+    padding: 44px 24px;
+    font-size: 13px;
+    color: var(--ink-soft);
+  }
+  footer b { color: var(--primary); }
+
+  @media (max-width: 760px) {
+    .hero { padding: 56px 20px 100px; }
+    .hero-logo { font-size: 38px; letter-spacing: 6px; }
+    .hero-tagline { font-size: 17px; letter-spacing: 2px; }
+    .phone-wrap { margin: 0 auto; }
+    .section-title { font-size: 25px; }
+    section { padding: 60px 20px; }
+  }
+</style>
+</head>
+<body>
+
+<!-- ═════════ Hero ═════════ -->
+<header class="hero">
+  <div class="hero-inner">
+    <div class="hero-copy">
+      <div class="hero-logo">V-<span>Flux</span></div>
+      <div class="hero-tagline">당신의 자산, 더 똑똑하게 흐르게</div>
+      <p class="hero-desc">
+        수입과 지출을 한눈에 확인하고 빠르게 기록하세요.
+        카드 승인 문자를 자동으로 감지해 가계부가 스스로 채워집니다.
+      </p>
+      <div class="hero-badges">
+        <span class="badge">📱 .NET MAUI</span>
+        <span class="badge">🔥 Firebase 동기화</span>
+        <span class="badge">🔒 문자 원문 미저장</span>
+        <span class="badge">🇰🇷 국내 카드사 지원</span>
+      </div>
+    </div>
+
+    <div class="phone-wrap">
+      <div class="phone">
+        <div class="screen">
+          <div class="screen-header">
+            <div class="t">가계부</div>
+            <div class="s">수입/지출을 한눈에 확인하고 빠르게 기록하세요</div>
+          </div>
+          <div class="screen-body">
+            <div class="month-card">
+              <div><div class="lb">이번 달</div><div class="vl">+2,220,181원</div></div>
+              <div><div class="lb">수입</div><div class="vl plus">+4,007,324원</div></div>
+              <div><div class="lb">지출</div><div class="vl minus">-1,787,143원</div></div>
+            </div>
+            <div class="entry">
+              <span class="chip in">수입</span>
+              <span class="name">월급</span>
+              <span class="amt plus">+4,007,324원</span>
+            </div>
+            <div class="entry">
+              <span class="chip out">지출</span>
+              <span class="name">월세, 공과금<small>매월 21일 · 반복</small></span>
+              <span class="amt minus">-605,000원</span>
+            </div>
+            <div class="entry">
+              <span class="chip out">지출</span>
+              <span class="name">AI<small>GPT PRO 결제</small></span>
+              <span class="amt minus">-58,262원</span>
+            </div>
+            <div class="entry">
+              <span class="chip out">지출</span>
+              <span class="name">커피<small>자동 감지 · 신한카드 · 문자</small></span>
+              <span class="amt minus">-4,500원</span>
+            </div>
+            <div class="fab">+</div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+</header>
+
+<!-- ═════════ 주요특징 ═════════ -->
+<section id="features">
+  <div class="section-inner">
+    <h2 class="section-title">주요<span class="hl">특징</span></h2>
+    <p class="section-sub">간편하지만 다양한 기능들이 있습니다.</p>
+
+    <div class="features">
+      <div class="feature">
+        <div class="feature-icon">🤖</div>
+        <h3>카드·은행 자동입력</h3>
+        <p>카드 승인·은행 입출금 문자와 알림을 자동으로 감지해 가계부에 바로 기입합니다. 신한·KB·현대·삼성·하나·BC 등 국내 주요 카드사와 연관 은행을 지원합니다.</p>
+        <span class="tag"># 문자·알림 감지</span>
+      </div>
+
+      <div class="feature">
+        <div class="feature-icon">🔁</div>
+        <h3>반복 수입·지출</h3>
+        <p>월세, 구독료, 월급처럼 매번 반복되는 내역은 주기와 적용 기간만 정하면 끝. 저장하는 순간 지정 기간의 내역이 즉시 반영됩니다.</p>
+        <span class="tag"># 매일 · 매주 · 매월</span>
+      </div>
+
+      <div class="feature">
+        <div class="feature-icon">🧮</div>
+        <h3>금액 입력란 속 계산기</h3>
+        <p>더치페이, 합산 금액도 앱을 떠날 필요 없이 금액 입력란에서 바로 계산하고 적용할 수 있습니다.</p>
+        <span class="tag"># 계산 후 바로 적용</span>
+      </div>
+
+      <div class="feature">
+        <div class="feature-icon">📅</div>
+        <h3>리스트 &amp; 캘린더 뷰</h3>
+        <p>이번 달 수입·지출 합계를 상단에서 한눈에 확인하고, 리스트와 캘린더 두 가지 방식으로 소비 흐름을 살펴볼 수 있습니다.</p>
+        <span class="tag"># 월별 요약</span>
+      </div>
+
+      <div class="feature">
+        <div class="feature-icon">🔒</div>
+        <h3>개인정보 걱정 없이</h3>
+        <p>카드 승인 문자에서 금액·사용처·일시만 분석합니다. 문자 원문은 저장하지 않고 서버로도 보내지 않습니다.</p>
+        <span class="tag"># 온디바이스 분석</span>
+      </div>
+
+      <div class="feature">
+        <div class="feature-icon">☁️</div>
+        <h3>Google 로그인 &amp; 클라우드 동기화</h3>
+        <p>Google 계정으로 간편하게 시작하세요. 기록은 Firebase에 안전하게 백업되어 기기를 바꿔도 그대로 이어집니다.</p>
+        <span class="tag"># 어디서나 이어보기</span>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- ═════════ 간단 가이드 ═════════ -->
+<section class="guide" id="guide">
+  <div class="section-inner">
+    <h2 class="section-title">3분이면 충분한 <span class="hl">시작 가이드</span></h2>
+    <p class="section-sub">복잡한 설정 없이 바로 기록을 시작하세요.</p>
+
+    <div class="steps">
+      <div class="step">
+        <div class="step-num"></div>
+        <h4>로그인</h4>
+        <p>이메일 또는 Google 계정으로 로그인하면 나만의 가계부가 준비됩니다.</p>
+      </div>
+      <div class="step">
+        <div class="step-num"></div>
+        <h4>+ 버튼으로 기록</h4>
+        <p>직접 입력, 반복 관리, 자동 입력 관리 중 원하는 방식을 골라 내역을 추가하세요.</p>
+      </div>
+      <div class="step">
+        <div class="step-num"></div>
+        <h4>자동입력 켜기</h4>
+        <p>가계부 &gt; 자동입력에서 사용 중인 카드사를 켜면 결제 알림이 자동으로 기입됩니다.</p>
+      </div>
+      <div class="step">
+        <div class="step-num"></div>
+        <h4>흐름 확인</h4>
+        <p>리스트·캘린더 뷰에서 월별 수입·지출 흐름을 한눈에 확인하세요.</p>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- ═════════ CTA ═════════ -->
+<section>
+  <div class="cta">
+    <h2>기록은 자동으로, 관리는 똑똑하게</h2>
+    <p>V-Flux와 함께 오늘부터 소비 흐름을 관리해 보세요.</p>
+    <a class="cta-btn" href="https://github.com/KoHyeonSeo/V-Flux">GitHub에서 보기</a>
+  </div>
+</section>
+
+<footer>
+  <b>V-Flux</b> · 자산 운용 애플리케이션 · Built with .NET MAUI &amp; Firebase
+</footer>
+
+</body>
+</html>

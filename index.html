@@ -337,17 +337,46 @@ section { padding: 104px 24px; }
 .section-sub { font-size: 16.5px; color: var(--ink-soft); word-break: keep-all; }
 .section-title .hl { color: var(--primary); }
 
-/* ───────── 주요특징: 탭 + 폰 쇼케이스 ───────── */
+/* ───────── 주요특징: 좌우 탭이 폰을 감싸는 쇼케이스 ───────── */
 .showcase {
-  display: flex;
-  gap: 48px;
+  display: grid;
+  grid-template-columns: minmax(0, 1fr) auto minmax(0, 1fr);
   align-items: center;
+  gap: 36px;
 }
-.feature-tabs {
-  flex: 1 1 380px;
+.feature-tabs { display: contents; }
+.tabcol {
   display: flex;
   flex-direction: column;
-  gap: 8px;
+  justify-content: center;
+  gap: 12px;
+  grid-row: 1;
+}
+.tabcol:nth-of-type(1) { grid-column: 1; }
+.tabcol:nth-of-type(2) { grid-column: 3; }
+.showcase-phone { grid-column: 2; grid-row: 1; }
+
+/* 오른쪽 컬럼은 좌우 대칭으로 미러링 */
+.tabcol:nth-of-type(2) .ftab {
+  text-align: right;
+  border-left: 1px solid rgba(108,92,231,.1);
+  border-right: 4px solid transparent;
+}
+.tabcol:nth-of-type(2) .ftab.is-active {
+  border-right-color: var(--primary);
+  border-left-color: rgba(108,92,231,.1);
+}
+.tabcol:nth-of-type(2) .ft-title { flex-direction: row-reverse; }
+.tabcol:nth-of-type(2) .ft-sub { margin-left: 0; margin-right: 26px; }
+.tabcol:nth-of-type(2) .ftab-bar { margin-left: 0; margin-right: 26px; }
+.tabcol:nth-of-type(2) .ftab:hover { transform: translateX(-4px); }
+.ftab:nth-of-type(4), .ftab:nth-of-type(5), .ftab:nth-of-type(6) {
+  border-left: 1px solid rgba(108,92,231,.1);
+  border-right: 4px solid transparent;
+}
+.ftab:nth-of-type(4).is-active, .ftab:nth-of-type(5).is-active, .ftab:nth-of-type(6).is-active {
+  border-right-color: var(--primary);
+  border-left-color: rgba(108,92,231,.1);
 }
 .ftab {
   text-align: left;
@@ -360,7 +389,7 @@ section { padding: 104px 24px; }
   cursor: pointer;
   transition: border-color .25s ease, background .25s ease, transform .25s ease;
 }
-.ftab:hover { transform: translateX(4px); }
+.ftab:hover { transform: translateX(4px); } /* 왼쪽 탭은 폰 쪽으로 */
 .ftab .ft-title {
   display: flex;
   align-items: center;
@@ -670,28 +699,32 @@ footer {
 footer b { color: var(--primary); }
 
 /* ───────── 반응형 ───────── */
+/* 좁은 화면: 폰 위에 2열 그리드로 6개 전부 노출 (가로 스크롤 없음) */
 @media (max-width: 880px) {
-  .showcase { flex-direction: column; gap: 32px; }
+  .showcase { display: flex; flex-direction: column; gap: 28px; }
   .feature-tabs {
-    flex: 0 0 auto;
-    flex-direction: row;
-    align-items: flex-start;
-    overflow-x: auto;
+    display: grid;
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+    gap: 10px;
     width: 100%;
-    padding-bottom: 8px;
-    scroll-snap-type: x proximity;
-    -webkit-overflow-scrolling: touch;
   }
-  .ftab {
-    flex: 0 0 auto;
-    scroll-snap-align: start;
-    border-left: none;
-    border-bottom: 4px solid transparent;
-    padding: 12px 16px 10px;
+  .tabcol { display: contents; }
+  .ftab, .tabcol:nth-of-type(2) .ftab {
+    text-align: left;
+    border-left: 4px solid transparent;
+    border-right: 1px solid rgba(108,92,231,.1);
+    padding: 12px 14px 10px;
   }
-  .ftab.is-active { border-bottom-color: var(--primary); }
+  .ftab.is-active, .tabcol:nth-of-type(2) .ftab.is-active {
+    border-left-color: var(--primary);
+    border-right-color: rgba(108,92,231,.1);
+  }
+  .tabcol:nth-of-type(2) .ft-title { flex-direction: row; }
   .ftab .ft-sub, .ftab-bar { display: none; }
-  .ftab:hover { transform: none; }
+  .ftab:hover, .tabcol:nth-of-type(2) .ftab:hover { transform: none; }
+}
+@media (max-width: 520px) {
+  .feature-tabs { grid-template-columns: 1fr; }
 }
 @media (max-width: 640px) {
   .hero { padding: 116px 20px 90px; }
@@ -731,10 +764,10 @@ footer b { color: var(--primary); }
   <div class="hero-inner">
     <div class="hero-copy">
       <span class="eyebrow">V-FLUX · 가계부</span>
-      <h1>결제하면,<br>가계부가 <mark>스스로</mark> 적힙니다</h1>
+      <h1>자산의 흐름,<br>이제는 <mark>똑똑하게</mark> 관리하자</h1>
       <p class="hero-desc">
-        카드 승인 문자와 은행 알림을 자동으로 감지해 기입하는 가계부.
-        이제 기록은 V-Flux에게 맡기고, 소비 흐름만 확인하세요.
+        카드 승인 문자와 은행 알림을 자동으로 감지해 스스로 기록되는 가계부.
+        기록은 V-Flux에게 맡기고, 소비 흐름만 확인하세요.
       </p>
       <div class="hero-cta-row">
         <a class="btn-primary" href="#features">주요 기능 보기</a>
@@ -806,6 +839,7 @@ footer b { color: var(--primary); }
 
     <div class="showcase reveal">
       <div class="feature-tabs" role="tablist" aria-label="주요 기능" aria-orientation="vertical">
+       <div class="tabcol" role="presentation">
         <button class="ftab is-active" role="tab" aria-selected="true" aria-controls="panel-0" id="tab-0">
           <span class="ft-title"><span class="ft-icon">🤖</span>카드·은행 자동입력</span>
           <span class="ft-sub">결제 문자·알림을 감지해 스스로 기입해요</span>
@@ -821,6 +855,8 @@ footer b { color: var(--primary); }
           <span class="ft-sub">금액 칸에서 바로 계산하고 그대로 적용</span>
           <span class="ftab-bar"><i></i></span>
         </button>
+       </div>
+       <div class="tabcol" role="presentation">
         <button class="ftab" role="tab" aria-selected="false" aria-controls="panel-3" id="tab-3">
           <span class="ft-title"><span class="ft-icon">📅</span>리스트 &amp; 캘린더</span>
           <span class="ft-sub">한 달의 소비 흐름이 한 화면에 들어와요</span>
@@ -836,6 +872,7 @@ footer b { color: var(--primary); }
           <span class="ft-sub">문자 원문 미저장 — 분석은 기기 안에서만</span>
           <span class="ftab-bar"><i></i></span>
         </button>
+       </div>
       </div>
 
       <div class="showcase-phone">
@@ -1080,14 +1117,16 @@ footer b { color: var(--primary); }
     }, true);
   });
 
-  tablist.addEventListener('mouseenter', () => { visible = false; });
-  tablist.addEventListener('mouseleave', () => {
+  /* display:contents인 tablist 대신 실제 박스를 가진 .showcase에 연결 */
+  const showcase = document.querySelector('.showcase');
+  showcase.addEventListener('mouseenter', () => { visible = false; });
+  showcase.addEventListener('mouseleave', () => {
     visible = true;
     if (autoAllowed()) activate(idx, false); /* 진행바 리스타트 */
   });
   if ('IntersectionObserver' in window) {
     new IntersectionObserver(([e]) => { visible = e.isIntersecting; },
-      { threshold: 0.3 }).observe(tablist);
+      { threshold: 0.3 }).observe(showcase);
   }
 
   tablist.addEventListener('keydown', e => {

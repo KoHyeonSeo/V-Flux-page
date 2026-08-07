@@ -3,740 +3,646 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>V-Flux — 결제하면, 가계부가 스스로 적힙니다</title>
+<title>V-Flux — 자산의 흐름, 이제는 똑똑하게 관리하자</title>
 <script>document.documentElement.classList.add('js');</script>
 <style>
 @import url("https://cdn.jsdelivr.net/gh/orioncactus/pretendard@v1.3.9/dist/web/variable/pretendardvariable-dynamic-subset.min.css");
+@import url("https://fonts.googleapis.com/css2?family=JetBrains+Mono:wght@400;500;700&display=swap");
 
 :root {
-  --primary: #6C5CE7;
-  --primary-deep: #2D1B8F;
-  --primary-dark: #1E1560;
-  --navy: #14103A;
-  --accent: #FFD166;
-  --mint: #2DD4BF;
-  --ink: #1c1c2e;
-  --ink-soft: #5a5a72;
-  --expense: #2563EB; /* 실제 앱 UI와 동일 (지출=파랑) */
-  --income: #E11D48;  /* 실제 앱 UI와 동일 (수입=빨강) */
-  --bg: #F6F5FB;
-  --card: #FFFFFF;
+  --canvas: #F6F5F7;
+  --surface: #FFFFFF;
+  --ink: #17161C;
+  --shell: #15131C;
+  --shell-2: #201D2C;
+  --muted: #6E6B7B;
+  --line: rgba(23, 22, 28, .09);
+  --accent: #5B4BD6;
+  --accent-wash: #EDEAFB;
+  --minus: #2A5BD7;
+  --plus: #C81E4E;
+
+  --sans: "Pretendard Variable", Pretendard, -apple-system, BlinkMacSystemFont, "Segoe UI", "Malgun Gothic", sans-serif;
+  --mono: "JetBrains Mono", ui-monospace, SFMono-Regular, Menlo, monospace;
+  --ease: cubic-bezier(.22, 1, .36, 1);
+  --maxw: 1200px;
+  --pad: clamp(4.5rem, 9vw, 7.5rem);
 }
+
 * { margin: 0; padding: 0; box-sizing: border-box; }
-html { scroll-behavior: smooth; }
+html { scroll-behavior: smooth; -webkit-text-size-adjust: 100%; }
 body {
-  font-family: "Pretendard Variable", Pretendard, -apple-system, BlinkMacSystemFont, "Segoe UI", "Malgun Gothic", sans-serif;
-  background: var(--bg);
+  font-family: var(--sans);
+  background: var(--canvas);
   color: var(--ink);
   line-height: 1.6;
   overflow-x: hidden;
+  -webkit-font-smoothing: antialiased;
 }
-.num { font-variant-numeric: tabular-nums; }
+svg { display: block; }
+.num { font-family: var(--mono); font-variant-numeric: tabular-nums; font-feature-settings: "tnum"; }
+.wrap { max-width: var(--maxw); margin: 0 auto; padding: 0 24px; }
 
-/* ───────── 스크롤 리빌 ───────── */
+.eyebrow {
+  font-family: var(--mono);
+  font-size: 11px;
+  font-weight: 500;
+  letter-spacing: .18em;
+  text-transform: uppercase;
+  color: var(--accent);
+}
+
+/* ── 스크롤 진입 ── */
 .js .reveal {
   opacity: 0;
-  transform: translateY(28px);
-  transition: opacity .6s ease, transform .6s cubic-bezier(.22,1,.36,1);
+  transform: translateY(22px);
+  transition: opacity .65s var(--ease), transform .65s var(--ease);
   transition-delay: var(--d, 0ms);
 }
 .js .reveal.in { opacity: 1; transform: none; }
-/* 등장 완료 후 JS가 reveal/in 클래스를 제거해 요소 본연의 hover transition을 복원한다 */
 
-/* ───────── 고정 헤더 ───────── */
+/* ═════════ 상단 바 ═════════ */
 .topbar {
   position: fixed;
-  top: 0; left: 0; right: 0;
-  z-index: 100;
+  inset: 0 0 auto 0;
+  z-index: 50;
   display: flex;
   align-items: center;
   justify-content: space-between;
-  padding: 14px 28px;
-  background: rgba(20, 16, 58, 0.72);
-  backdrop-filter: blur(12px);
-  -webkit-backdrop-filter: blur(12px);
-}
-.topbar .logo { color: #fff; font-weight: 800; font-size: 17px; letter-spacing: 1px; text-decoration: none; }
-.topbar .logo span { color: var(--accent); }
-.topbar nav { display: flex; gap: 22px; align-items: center; }
-.topbar nav a {
-  color: rgba(255,255,255,.75);
-  text-decoration: none;
-  font-size: 14px;
-  font-weight: 600;
-  transition: color .2s ease;
-}
-.topbar nav a:hover { color: #fff; }
-.topbar .nav-cta {
-  background: var(--accent);
-  color: var(--primary-dark);
-  padding: 8px 18px;
-  border-radius: 999px;
-  font-weight: 800;
-}
-.topbar .nav-cta:hover { color: var(--primary-dark); filter: brightness(1.06); }
-@media (max-width: 640px) { .topbar nav a:not(.nav-cta) { display: none; } }
-
-/* ───────── 히어로 ───────── */
-.hero {
-  position: relative;
-  background:
-    radial-gradient(1000px 600px at 85% -10%, rgba(123,108,255,.35), transparent 60%),
-    linear-gradient(150deg, var(--navy) 0%, var(--primary-dark) 40%, var(--primary-deep) 100%);
-  color: #fff;
-  padding: 140px 24px 120px;
-  overflow: hidden;
-}
-.hero-inner {
-  max-width: 1060px;
+  gap: 24px;
+  max-width: var(--maxw);
   margin: 0 auto;
-  display: flex;
-  align-items: center;
-  justify-content: space-between;
-  gap: 56px;
-  flex-wrap: wrap;
+  padding: 20px 24px;
 }
-.hero-copy { flex: 1 1 400px; }
-.eyebrow {
-  display: inline-block;
-  font-size: 13px;
-  font-weight: 700;
-  letter-spacing: .14em;
-  color: var(--accent);
-  margin-bottom: 18px;
-}
-.hero h1 {
-  font-size: clamp(38px, 5.2vw, 58px);
-  font-weight: 800;
-  letter-spacing: -0.03em;
-  line-height: 1.18;
-  margin-bottom: 20px;
-  word-break: keep-all;
-}
-.hero h1 mark {
-  background: none;
-  color: var(--accent);
-}
-.hero-desc {
-  font-size: 18px;
-  line-height: 1.7;
-  opacity: .78;
-  max-width: 440px;
-  margin-bottom: 30px;
-  word-break: keep-all;
-}
-.hero-cta-row { display: flex; gap: 12px; flex-wrap: wrap; margin-bottom: 26px; }
-.btn-primary {
-  display: inline-block;
-  background: var(--accent);
-  color: var(--primary-dark);
-  font-weight: 800;
-  font-size: 16px;
-  padding: 15px 32px;
-  border-radius: 14px;
-  text-decoration: none;
-  transition: transform .3s cubic-bezier(.34,1.56,.64,1), box-shadow .3s ease;
-}
-.btn-primary:hover { transform: translateY(-3px); box-shadow: 0 14px 30px rgba(255,209,102,.3); }
-.btn-ghost {
-  display: inline-block;
-  border: 1px solid rgba(255,255,255,.35);
-  color: #fff;
-  font-weight: 700;
-  font-size: 16px;
-  padding: 15px 28px;
-  border-radius: 14px;
-  text-decoration: none;
-  transition: background .25s ease, border-color .25s ease;
-}
-.btn-ghost:hover { background: rgba(255,255,255,.1); border-color: rgba(255,255,255,.6); }
-.hero-badges { display: flex; gap: 8px; flex-wrap: wrap; }
-.badge {
-  padding: 7px 14px;
-  border-radius: 999px;
-  background: rgba(255,255,255,.1);
-  border: 1px solid rgba(255,255,255,.18);
-  font-size: 12.5px;
-  font-weight: 600;
-  color: rgba(255,255,255,.85);
-}
-
-/* 히어로 로드 애니메이션 */
-@keyframes rise { from { opacity: 0; transform: translateY(26px); } to { opacity: 1; transform: none; } }
-.hero-copy > * { animation: rise .7s cubic-bezier(.22,1,.36,1) both; }
-.hero-copy > *:nth-child(2) { animation-delay: .08s; }
-.hero-copy > *:nth-child(3) { animation-delay: .16s; }
-.hero-copy > *:nth-child(4) { animation-delay: .24s; }
-.hero-copy > *:nth-child(5) { animation-delay: .32s; }
-.phone-wrap { animation: rise .8s .2s cubic-bezier(.22,1,.36,1) both; }
-
-/* ───────── 폰 목업 공통 ───────── */
-.phone-wrap { flex: 0 0 auto; position: relative; }
-.phone-wrap::before {
+.topbar::before {
   content: "";
-  position: absolute;
-  inset: -50px;
-  background: radial-gradient(closest-side, rgba(123,108,255,.5), transparent 70%);
-  filter: blur(24px);
+  position: fixed;
+  inset: 0 0 auto 0;
+  height: 76px;
+  background: rgba(21, 19, 28, .55);
+  backdrop-filter: blur(14px);
+  -webkit-backdrop-filter: blur(14px);
+  opacity: 0;
+  transition: opacity .4s var(--ease);
   pointer-events: none;
+  z-index: -1;
 }
-.phone {
-  position: relative;
-  width: 292px;
-  border-radius: 40px;
-  background: #0f0c29;
-  padding: 10px;
-  box-shadow: 0 40px 80px rgba(5, 3, 30, 0.5);
-}
-@keyframes float { 0%,100% { transform: translateY(0); } 50% { transform: translateY(-10px); } }
-.hero .phone { animation: float 5.5s ease-in-out infinite; }
-.phone::before { /* 다이내믹 아일랜드 */
-  content: "";
-  position: absolute;
-  top: 20px; left: 50%;
-  transform: translateX(-50%);
-  width: 78px; height: 20px;
-  border-radius: 11px;
-  background: #0f0c29;
-  z-index: 3;
-}
-.screen {
-  position: relative;
-  border-radius: 31px;
-  overflow: hidden;
-  background: var(--bg);
-  font-size: 12px;
-  color: var(--ink);
-}
-.statusbar {
-  display: flex;
-  justify-content: space-between;
-  align-items: center;
-  padding: 9px 20px 0;
-  font-size: 10.5px;
-  font-weight: 700;
-  color: #fff;
-  position: relative;
-  z-index: 2;
-}
-.screen-header {
-  background: linear-gradient(135deg, var(--primary-deep), var(--primary));
-  color: #fff;
-  padding: 6px 16px 13px;
-}
-.screen-header .t { font-size: 15px; font-weight: 800; }
-.screen-header .s { font-size: 9.5px; opacity: .78; }
-.screen .statusbar { margin-top: 0; background: linear-gradient(135deg, var(--primary-deep), var(--primary)); padding-bottom: 10px; }
-.screen-body { padding: 12px; min-height: 300px; position: relative; }
-.home-indicator {
-  width: 110px; height: 4px;
-  border-radius: 2px;
-  background: rgba(20,16,58,.28);
-  margin: 2px auto 8px;
-}
-.month-card {
-  background: #fff;
-  border-radius: 14px;
-  padding: 10px 12px;
-  display: flex;
-  justify-content: space-between;
-  margin-bottom: 10px;
-  box-shadow: 0 4px 14px rgba(30, 20, 90, .06);
-}
-.month-card > div { text-align: center; }
-.month-card .lb { font-size: 9px; color: var(--ink-soft); }
-.month-card .vl { font-size: 11px; font-weight: 800; white-space: nowrap; }
-.vl.minus { color: var(--expense); }
-.vl.plus { color: var(--income); }
-.entry {
-  background: #fff;
-  border-radius: 12px;
-  padding: 9px 12px;
-  display: flex;
-  align-items: center;
-  gap: 8px;
-  margin-bottom: 8px;
-  box-shadow: 0 3px 10px rgba(30, 20, 90, .05);
-}
-.chip {
-  font-size: 9px;
-  font-weight: 700;
-  padding: 2px 8px;
-  border-radius: 999px;
-  flex-shrink: 0;
-}
-.chip.out { background: #E8F0FE; color: var(--expense); }
-.chip.in { background: #FDE8EE; color: var(--income); }
-.entry .name { flex: 1; font-weight: 700; font-size: 11px; min-width: 0; }
-.entry .name small { display: block; font-weight: 500; color: var(--ink-soft); font-size: 9px; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
-.entry .amt { font-weight: 800; font-size: 11px; white-space: nowrap; }
-.amt.minus { color: var(--expense); }
-.amt.plus { color: var(--income); }
-
-/* ── 히어로: 자동입력 라이브 데모 ── */
-.notif {
-  position: absolute;
-  top: 6px; left: 8px; right: 8px;
-  z-index: 4;
-  background: rgba(255,255,255,.97);
-  border-radius: 12px;
-  padding: 8px 11px;
-  display: flex;
-  gap: 8px;
-  align-items: center;
-  box-shadow: 0 10px 24px rgba(20,16,58,.25);
-  animation: notif-cycle 7s cubic-bezier(.22,1,.36,1) infinite;
-}
-.notif .n-icon {
-  width: 26px; height: 26px;
-  border-radius: 8px;
-  background: linear-gradient(135deg, var(--primary), var(--accent));
-  display: flex; align-items: center; justify-content: center;
-  font-size: 13px;
-  flex-shrink: 0;
-}
-.notif .n-body { font-size: 9.5px; line-height: 1.35; min-width: 0; }
-.notif .n-body b { display: block; font-size: 10px; }
-.notif .n-body span { color: var(--ink-soft); }
-@keyframes notif-cycle {
-  0%, 6%   { transform: translateY(-130%); opacity: 0; }
-  12%, 40% { transform: translateY(0); opacity: 1; }
-  48%, 100%{ transform: translateY(-130%); opacity: 0; }
-}
-.entry.auto {
-  border: 1px solid rgba(255,209,102,.0);
-  animation: entry-land 7s cubic-bezier(.34,1.56,.64,1) infinite;
-  overflow: hidden;
-}
-@keyframes entry-land {
-  0%, 48%  { opacity: 0; transform: translateY(-12px) scale(.96); max-height: 0; margin-bottom: 0; padding-top: 0; padding-bottom: 0; border-color: rgba(255,209,102,0); }
-  58%      { opacity: 1; transform: none; max-height: 52px; margin-bottom: 8px; padding-top: 9px; padding-bottom: 9px; border-color: rgba(255,209,102,.9); }
-  75%, 100%{ opacity: 1; transform: none; max-height: 52px; margin-bottom: 8px; padding-top: 9px; padding-bottom: 9px; border-color: rgba(255,209,102,0); }
-}
-.tag-auto {
-  font-size: 8px;
-  font-weight: 800;
-  color: #8a6d00;
-  background: var(--accent);
-  border-radius: 999px;
-  padding: 1.5px 6px;
-  flex-shrink: 0;
-}
-
-/* ───────── 공통 섹션 ───────── */
-section { padding: 104px 24px; }
-.section-inner { max-width: 1060px; margin: 0 auto; }
-.section-head { text-align: center; margin-bottom: 40px; }
-.section-title {
-  font-size: clamp(30px, 4vw, 42px);
-  font-weight: 800;
-  letter-spacing: -0.02em;
-  margin-bottom: 12px;
-  word-break: keep-all;
-}
-.section-sub { font-size: 16.5px; color: var(--ink-soft); word-break: keep-all; }
-.section-title .hl { color: var(--primary); }
-
-/* ───────── 주요특징: 좌우 탭이 폰을 감싸는 쇼케이스 ───────── */
-.showcase {
-  display: grid;
-  grid-template-columns: minmax(0, 1fr) auto minmax(0, 1fr);
-  align-items: center;
-  gap: 36px;
-}
-.feature-tabs { display: contents; }
-.tabcol {
-  display: flex;
-  flex-direction: column;
-  justify-content: center;
-  gap: 12px;
-  grid-row: 1;
-}
-.tabcol:nth-of-type(1) { grid-column: 1; }
-.tabcol:nth-of-type(2) { grid-column: 3; }
-.showcase-phone { grid-column: 2; grid-row: 1; }
-
-/* 오른쪽 컬럼은 좌우 대칭으로 미러링 */
-.tabcol:nth-of-type(2) .ftab {
-  text-align: right;
-  border-left: 1px solid rgba(108,92,231,.1);
-  border-right: 4px solid transparent;
-}
-.tabcol:nth-of-type(2) .ftab.is-active {
-  border-right-color: var(--primary);
-  border-left-color: rgba(108,92,231,.1);
-}
-.tabcol:nth-of-type(2) .ft-title { flex-direction: row-reverse; }
-.tabcol:nth-of-type(2) .ft-sub { margin-left: 0; margin-right: 26px; }
-.tabcol:nth-of-type(2) .ftab-bar { margin-left: 0; margin-right: 26px; }
-.tabcol:nth-of-type(2) .ftab:hover { transform: translateX(-4px); }
-.ftab:nth-of-type(4), .ftab:nth-of-type(5), .ftab:nth-of-type(6) {
-  border-left: 1px solid rgba(108,92,231,.1);
-  border-right: 4px solid transparent;
-}
-.ftab:nth-of-type(4).is-active, .ftab:nth-of-type(5).is-active, .ftab:nth-of-type(6).is-active {
-  border-right-color: var(--primary);
-  border-left-color: rgba(108,92,231,.1);
-}
-.ftab {
-  text-align: left;
-  font-family: inherit;
-  background: var(--card);
-  border: 1px solid rgba(108,92,231,.1);
-  border-left: 4px solid transparent;
-  border-radius: 14px;
-  padding: 12px 18px 10px;
-  cursor: pointer;
-  transition: border-color .25s ease, background .25s ease, transform .25s ease;
-}
-.ftab:hover { transform: translateX(4px); } /* 왼쪽 탭은 폰 쪽으로 */
-.ftab .ft-title {
+.topbar.stuck::before { opacity: 1; }
+.brand {
   display: flex;
   align-items: center;
   gap: 9px;
-  font-size: 15.5px;
-  font-weight: 800;
-  color: var(--ink);
+  color: #fff;
+  text-decoration: none;
+  font-weight: 700;
+  font-size: 16px;
+  letter-spacing: -.01em;
 }
-.ftab .ft-icon { font-size: 17px; }
-.ftab .ft-sub {
-  display: block;
-  font-size: 12.5px;
-  color: var(--ink-soft);
-  margin: 2px 0 6px 26px;
-  word-break: keep-all;
+.brand .mark {
+  width: 22px; height: 22px;
+  border-radius: 7px;
+  background: var(--accent);
+  display: grid;
+  place-items: center;
+  color: #fff;
 }
-.ftab-bar {
-  display: block;
-  height: 3px;
-  margin-left: 26px;
-  background: rgba(108,92,231,.12);
-  border-radius: 2px;
-  overflow: hidden;
-  opacity: 0;
-  transition: opacity .25s ease;
+.topbar nav { display: flex; gap: 26px; }
+.topbar nav a {
+  display: flex;
+  align-items: center;
+  min-height: 44px;           /* 터치 타깃 최소 44px */
+  color: rgba(255, 255, 255, .62);
+  text-decoration: none;
+  font-size: 14px;
+  font-weight: 500;
+  transition: color .25s var(--ease);
 }
-.ftab-bar i {
-  display: block;
-  height: 100%;
-  background: var(--primary);
-  transform: scaleX(0);
-  transform-origin: left;
-}
-.ftab.is-active {
-  border-left-color: var(--primary);
-  background: #F3F0FF;
-}
-.ftab.is-active .ftab-bar { opacity: 1; }
-.ftab.is-active .ftab-bar i { animation: fill 6s linear forwards; }
-.feature-tabs.manual .ftab-bar { opacity: 0; }
-.feature-tabs.manual .ftab.is-active .ftab-bar i { animation: none; }
-@keyframes fill { to { transform: scaleX(1); } }
+.topbar nav a:hover { color: #fff; }
 
-/* 폰 칸은 항상 같은 크기 — 캡션 길이가 레이아웃을 흔들지 않도록 고정 */
-.showcase-phone { flex: 0 0 auto; width: 300px; }
-.showcase-phone .phone { width: 300px; }
-.showcase-phone .screen-body { height: 356px; min-height: 0; }
-.fpanel {
+/* ═════════ 히어로 ═════════ */
+.hero {
+  position: relative;
+  background: var(--shell);
+  color: #fff;
+  padding: 168px 0 clamp(96px, 12vw, 148px);
+  overflow: hidden;
+}
+.hero::before {
+  content: "";
   position: absolute;
-  inset: 0;
-  padding: 12px;
-  opacity: 0;
-  transform: translateY(12px);
-  transition: opacity .35s ease, transform .35s cubic-bezier(.22,1,.36,1);
+  width: 760px; height: 760px;
+  right: -220px; top: -320px;
+  border-radius: 50%;
+  background: radial-gradient(closest-side, rgba(91, 75, 214, .26), transparent);
   pointer-events: none;
 }
-.fpanel.is-active { opacity: 1; transform: none; pointer-events: auto; }
-.panel-note {
-  text-align: center;
-  font-size: 13px;
-  line-height: 1.55;
-  color: var(--ink-soft);
-  margin-top: 16px;
-  width: 100%;
-  height: 60px;          /* 3줄 고정 — 탭이 바뀌어도 폰 위치가 흔들리지 않음 */
-  overflow: hidden;
+.hero::after { /* 미세 그레인 */
+  content: "";
+  position: absolute;
+  inset: 0;
+  opacity: .5;
+  pointer-events: none;
+  background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='140' height='140'%3E%3Cfilter id='n'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='.85' numOctaves='3'/%3E%3CfeColorMatrix type='saturate' values='0'/%3E%3C/filter%3E%3Crect width='140' height='140' filter='url(%23n)' opacity='.045'/%3E%3C/svg%3E");
+}
+.hero-grid {
+  position: relative;
+  z-index: 1;
+  display: grid;
+  grid-template-columns: 1.08fr .92fr;
+  gap: clamp(40px, 6vw, 88px);
+  align-items: center;
+}
+.hero h1 {
+  font-size: clamp(2.35rem, 5vw, 3.85rem);
+  font-weight: 800;
+  letter-spacing: -.035em;
+  line-height: 1.14;
+  margin: 18px 0 22px;
   word-break: keep-all;
 }
-
-/* 패널 내부 위젯 */
-.mini-notif {
-  background: #fff;
-  border-radius: 12px;
-  padding: 8px 11px;
-  display: flex;
-  gap: 8px;
-  align-items: center;
-  margin-bottom: 10px;
-  border: 1px dashed rgba(108,92,231,.4);
-  font-size: 9.5px;
-  line-height: 1.35;
+.hero h1 em {
+  font-style: normal;
+  color: #B6A9FF;
 }
-.mini-notif b { font-size: 10px; }
-.flow-arrow { text-align: center; color: var(--primary); font-size: 13px; margin: 2px 0 8px; }
-.card-chips { display: flex; flex-wrap: wrap; gap: 5px; margin-top: 10px; }
-.cchip {
-  font-size: 9px;
-  font-weight: 700;
-  padding: 3px 9px;
-  border-radius: 999px;
-  background: #fff;
-  border: 1px solid rgba(108,92,231,.2);
-  color: var(--primary-deep);
+.hero p.lead {
+  font-size: clamp(1rem, 1.3vw, 1.075rem);
+  line-height: 1.75;
+  color: rgba(255, 255, 255, .64);
+  max-width: 34ch;
+  word-break: keep-all;
 }
-.form-row { background: #fff; border-radius: 12px; padding: 9px 12px; margin-bottom: 8px; box-shadow: 0 3px 10px rgba(30,20,90,.05); }
-.form-row .fl { font-size: 9px; color: var(--ink-soft); }
-.form-row .fv { font-size: 12px; font-weight: 800; }
-.calc-field {
-  background: #fff;
-  border-radius: 12px;
-  padding: 10px 12px;
-  margin-bottom: 10px;
-  box-shadow: 0 3px 10px rgba(30,20,90,.05);
-}
-.calc-field .expr { font-size: 14px; font-weight: 800; letter-spacing: .5px; }
-.calc-field .res { font-size: 11px; color: var(--primary); font-weight: 800; }
-.keypad { display: grid; grid-template-columns: repeat(4, 1fr); gap: 6px; }
-.key {
-  background: #fff;
-  border-radius: 10px;
-  text-align: center;
-  padding: 8px 0;
-  font-size: 13px;
-  font-weight: 800;
-  color: var(--primary-deep);
-  box-shadow: 0 2px 6px rgba(30,20,90,.05);
-}
-.key.op { background: #EFEBFF; }
-.key.eq { background: var(--primary); color: #fff; grid-row: span 2; display: flex; align-items: center; justify-content: center; }
-.apply-btn {
-  margin-top: 10px;
-  background: var(--primary);
-  color: #fff;
-  text-align: center;
-  border-radius: 12px;
-  padding: 9px 0;
-  font-size: 12px;
-  font-weight: 800;
-}
-.segment {
-  display: flex;
-  background: #EDEAF7;
-  border-radius: 12px;
-  padding: 4px;
-  margin-bottom: 10px;
-}
-.segment div {
-  flex: 1;
-  text-align: center;
-  font-size: 11px;
-  font-weight: 800;
-  padding: 6px 0;
-  border-radius: 9px;
-  color: var(--ink-soft);
-}
-.segment .on { background: var(--primary-deep); color: #fff; }
-.calgrid {
-  display: grid;
-  grid-template-columns: repeat(7, 1fr);
-  gap: 3px;
-  background: #fff;
-  border-radius: 14px;
-  padding: 10px;
-  box-shadow: 0 4px 14px rgba(30,20,90,.06);
-}
-.calgrid .dow { font-size: 8px; text-align: center; color: var(--ink-soft); font-weight: 700; }
-.cal-cell {
-  min-height: 30px;
-  border-radius: 6px;
-  font-size: 8.5px;
-  text-align: center;
-  padding-top: 2px;
-  color: var(--ink);
-}
-.cal-cell em { display: block; font-style: normal; font-size: 7px; font-weight: 800; }
-.cal-cell em.e { color: var(--expense); }
-.cal-cell em.i { color: var(--income); }
-.cal-cell.today { background: #EFEBFF; font-weight: 800; }
-.sync-box { text-align: center; padding-top: 16px; }
-.sync-logo {
-  width: 58px; height: 58px;
-  margin: 0 auto 12px;
-  border-radius: 18px;
-  background: linear-gradient(135deg, var(--primary-deep), var(--primary));
-  color: #fff;
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  font-weight: 800;
-  font-size: 13px;
-  letter-spacing: 1px;
-}
-.gbtn {
-  background: #fff;
-  border-radius: 12px;
-  padding: 10px 14px;
-  font-size: 11px;
-  font-weight: 700;
-  box-shadow: 0 3px 10px rgba(30,20,90,.08);
+.cta {
   display: inline-flex;
   align-items: center;
-  gap: 8px;
-  margin-bottom: 18px;
-}
-.gbtn .g { color: #4285F4; font-weight: 800; font-size: 13px; }
-.sync-line {
-  display: flex;
-  align-items: center;
-  justify-content: center;
   gap: 10px;
-  font-size: 20px;
-  margin-bottom: 10px;
+  margin-top: 34px;
+  background: var(--accent);
+  color: #fff;
+  font-family: var(--sans);
+  font-size: 15px;
+  font-weight: 700;
+  letter-spacing: -.01em;
+  padding: 15px 26px;
+  border-radius: 12px;
+  text-decoration: none;
+  transition: transform .2s var(--ease), background .25s var(--ease);
 }
-.sync-line .dotline {
-  width: 34px; height: 2px;
-  background: repeating-linear-gradient(90deg, var(--primary) 0 4px, transparent 4px 8px);
+.cta:hover { background: #6857E4; }
+.cta:active { transform: translateY(1px); }
+.cta svg { width: 16px; height: 16px; }
+
+.hero-meta {
+  display: flex;
+  gap: 30px;
+  margin-top: 44px;
+  padding-top: 26px;
+  border-top: 1px solid rgba(255, 255, 255, .1);
+  max-width: 420px;
 }
-.sync-ok { font-size: 10.5px; font-weight: 800; color: #0E9F6E; }
-.perm-row {
+.hero-meta div { min-width: 0; }
+.hero-meta dt {
+  font-family: var(--mono);
+  font-size: 10.5px;
+  letter-spacing: .14em;
+  text-transform: uppercase;
+  color: rgba(255, 255, 255, .38);
+  margin-bottom: 5px;
+}
+.hero-meta dd { font-size: 13.5px; font-weight: 600; color: rgba(255, 255, 255, .82); }
+
+/* ── 기기 목업 ── */
+.device-col { display: flex; justify-content: center; }
+.device {
+  position: relative;
+  width: 300px;
+  border-radius: 40px;
+  background: #0D0C12;
+  padding: 9px;
+  box-shadow: 0 50px 90px -30px rgba(0, 0, 0, .8);
+}
+.device::before {
+  content: "";
+  position: absolute;
+  top: 19px; left: 50%;
+  transform: translateX(-50%);
+  width: 74px; height: 19px;
+  border-radius: 11px;
+  background: #0D0C12;
+  z-index: 3;
+}
+.screen {
+  border-radius: 32px;
+  overflow: hidden;
+  background: var(--canvas);
+  color: var(--ink);
+}
+.sbar {
   display: flex;
   justify-content: space-between;
   align-items: center;
-  gap: 8px;
-  background: #fff;
-  border-radius: 12px;
-  padding: 9px 12px;
-  margin-bottom: 8px;
-  box-shadow: 0 3px 10px rgba(30,20,90,.05);
-  font-size: 11px;
-  font-weight: 700;
+  padding: 10px 18px 0;
+  background: var(--shell-2);
+  color: rgba(255, 255, 255, .9);
+  font-family: var(--mono);
+  font-size: 10.5px;
+  font-weight: 500;
 }
-.perm-row small { display: block; font-weight: 500; color: var(--ink-soft); font-size: 9px; }
-.perm-row small.ok { color: #0E9F6E; }
-.pill-ok {
-  background: var(--primary);
+.sbar .sig { display: flex; gap: 4px; align-items: center; opacity: .8; }
+.shead {
+  background: var(--shell-2);
   color: #fff;
-  font-size: 9px;
-  font-weight: 800;
-  border-radius: 999px;
-  padding: 4px 11px;
+  padding: 12px 18px 16px;
+}
+.shead .h { font-size: 15px; font-weight: 700; letter-spacing: -.02em; }
+.shead .s { font-family: var(--mono); font-size: 10px; color: rgba(255, 255, 255, .45); margin-top: 2px; }
+.sbody { padding: 12px; }
+
+.summary {
+  display: flex;
+  justify-content: space-between;
+  gap: 6px;
+  background: var(--surface);
+  border: 1px solid var(--line);
+  border-radius: 13px;
+  padding: 11px 13px;
+  margin-bottom: 10px;
+}
+.summary div { text-align: center; min-width: 0; }
+.summary dt {
+  font-family: var(--mono);
+  font-size: 8.5px;
+  letter-spacing: .1em;
+  text-transform: uppercase;
+  color: var(--muted);
+  margin-bottom: 3px;
+}
+.summary dd { font-size: 11px; font-weight: 700; white-space: nowrap; }
+.summary dd.m { color: var(--minus); }
+.summary dd.p { color: var(--plus); }
+
+/* 알림 슬롯 — 높이를 예약해 레이아웃이 밀리지 않게 한다 */
+.notif-slot { height: 56px; margin-bottom: 4px; }
+.notif {
+  display: flex;
+  gap: 9px;
+  align-items: center;
+  background: var(--surface);
+  border: 1px solid var(--line);
+  border-radius: 13px;
+  padding: 9px 11px;
+  box-shadow: 0 10px 24px -12px rgba(23, 22, 28, .35);
+  animation: notifCycle 8s var(--ease) infinite;
+}
+.notif .ic {
+  width: 26px; height: 26px;
+  border-radius: 8px;
+  background: var(--accent-wash);
+  color: var(--accent);
+  display: grid;
+  place-items: center;
   flex-shrink: 0;
 }
-.toggle {
-  width: 34px; height: 20px;
+.notif .ic svg { width: 14px; height: 14px; }
+.notif b { display: block; font-size: 10.5px; font-weight: 700; letter-spacing: -.01em; }
+.notif span { font-family: var(--mono); font-size: 9px; color: var(--muted); }
+@keyframes notifCycle {
+  0%, 5%   { opacity: 0; transform: translateY(-18px); }
+  11%, 40% { opacity: 1; transform: none; }
+  47%, 100%{ opacity: 0; transform: translateY(-18px); }
+}
+
+.row {
+  display: flex;
+  align-items: center;
+  gap: 9px;
+  background: var(--surface);
+  border: 1px solid var(--line);
+  border-radius: 13px;
+  padding: 10px 12px;
+  margin-bottom: 7px;
+}
+.tag {
+  font-family: var(--mono);
+  font-size: 8.5px;
+  font-weight: 500;
+  padding: 3px 7px;
+  border-radius: 5px;
+  flex-shrink: 0;
+  letter-spacing: .04em;
+}
+.tag.out { background: rgba(42, 91, 215, .09); color: var(--minus); }
+.tag.in  { background: rgba(200, 30, 78, .08); color: var(--plus); }
+.row .nm { flex: 1; min-width: 0; font-size: 11.5px; font-weight: 600; letter-spacing: -.01em; }
+.row .nm i {
+  display: block;
+  font-style: normal;
+  font-family: var(--mono);
+  font-size: 8.5px;
+  font-weight: 400;
+  color: var(--muted);
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  margin-top: 1px;
+}
+.row .amt { font-size: 11.5px; font-weight: 700; white-space: nowrap; }
+.amt.m { color: var(--minus); }
+.amt.p { color: var(--plus); }
+.auto-badge {
+  font-family: var(--mono);
+  font-size: 8px;
+  font-weight: 500;
+  color: var(--accent);
+  border: 1px solid rgba(91, 75, 214, .3);
   border-radius: 999px;
-  background: #cfcbe8;
+  padding: 2px 6px;
+  flex-shrink: 0;
+}
+.row.landed {
+  animation: land 8s var(--ease) infinite;
+  overflow: hidden;
+}
+@keyframes land {
+  0%, 45%   { opacity: 0; transform: translateY(-10px); max-height: 0; margin-bottom: 0; padding-top: 0; padding-bottom: 0; border-width: 0; }
+  55%, 100% { opacity: 1; transform: none; max-height: 54px; margin-bottom: 7px; padding-top: 10px; padding-bottom: 10px; border-width: 1px; }
+}
+.home-bar {
+  width: 104px; height: 4px;
+  border-radius: 2px;
+  background: rgba(23, 22, 28, .22);
+  margin: 4px auto 9px;
+}
+
+/* ═════════ 섹션 공통 ═════════ */
+section { padding: var(--pad) 0; }
+.sec-head {
+  display: grid;
+  grid-template-columns: minmax(0, 1fr) minmax(0, 1fr);
+  gap: 32px;
+  align-items: end;
+  margin-bottom: clamp(36px, 4vw, 54px);
+}
+.sec-head h2 {
+  font-size: clamp(1.85rem, 3.4vw, 2.7rem);
+  font-weight: 800;
+  letter-spacing: -.035em;
+  line-height: 1.2;
+  margin-top: 14px;
+  word-break: keep-all;
+}
+.sec-head p {
+  font-size: 1rem;
+  line-height: 1.75;
+  color: var(--muted);
+  max-width: 40ch;
+  word-break: keep-all;
+  padding-bottom: 4px;
+}
+
+/* ═════════ 주요 기능 — 비대칭 벤토 ═════════ */
+.bento {
+  display: grid;
+  grid-template-columns: repeat(4, minmax(0, 1fr));
+  gap: 14px;
+}
+.tile {
+  background: var(--surface);
+  border: 1px solid var(--line);
+  border-radius: 20px;
+  padding: 24px;
+  display: flex;
+  flex-direction: column;
+  transition: transform .35s var(--ease), box-shadow .35s var(--ease), border-color .35s var(--ease);
+}
+.tile:hover {
+  transform: translateY(-3px);
+  border-color: rgba(91, 75, 214, .22);
+  box-shadow: 0 22px 40px -24px rgba(23, 22, 28, .35);
+}
+.tile-ic {
+  width: 34px; height: 34px;
+  border-radius: 10px;
+  background: var(--accent-wash);
+  color: var(--accent);
+  display: grid;
+  place-items: center;
+  margin-bottom: 16px;
+}
+.tile-ic svg { width: 17px; height: 17px; }
+.tile .idx {
+  font-family: var(--mono);
+  font-size: 10.5px;
+  letter-spacing: .14em;
+  color: var(--muted);
+  margin-bottom: 9px;
+}
+.tile h3 {
+  font-size: 1.0625rem;
+  font-weight: 700;
+  letter-spacing: -.025em;
+  margin-bottom: 7px;
+}
+.tile p {
+  font-size: .875rem;
+  line-height: 1.68;
+  color: var(--muted);
+  word-break: keep-all;
+}
+.tile .visual { margin-top: 18px; }
+
+.t-auto   { grid-column: span 2; grid-row: span 2; }
+.t-repeat { grid-column: span 2; }
+.t-calc   { grid-column: span 1; }
+.t-sync   { grid-column: span 1; }
+.t-view   { grid-column: span 2; }
+.t-privacy{ grid-column: span 2; }
+.t-auto h3 { font-size: 1.3rem; }
+.t-auto p { font-size: .9375rem; max-width: 40ch; }
+.t-auto .visual { margin-top: auto; padding-top: 22px; }
+
+/* 타일 내부 미니 목업 */
+.mini {
+  background: var(--canvas);
+  border: 1px solid var(--line);
+  border-radius: 12px;
+  padding: 10px 12px;
+  display: flex;
+  align-items: center;
+  gap: 9px;
+}
+.mini + .mini { margin-top: 7px; }
+.mini .lbl { flex: 1; min-width: 0; font-size: 11.5px; font-weight: 600; }
+.mini .lbl i {
+  display: block;
+  font-style: normal;
+  font-family: var(--mono);
+  font-size: 9px;
+  font-weight: 400;
+  color: var(--muted);
+  margin-top: 1px;
+}
+.mini .val { font-family: var(--mono); font-size: 11.5px; font-weight: 700; white-space: nowrap; }
+.mini.dashed { border-style: dashed; background: transparent; }
+.flow {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  margin: 9px 0;
+  color: var(--accent);
+  font-family: var(--mono);
+  font-size: 9.5px;
+  letter-spacing: .1em;
+  text-transform: uppercase;
+}
+.flow::after { content: ""; flex: 1; height: 1px; background: var(--line); }
+.flow svg { width: 13px; height: 13px; }
+
+.chips { display: flex; flex-wrap: wrap; gap: 5px; margin-top: 14px; }
+.chips span {
+  font-family: var(--mono);
+  font-size: 10px;
+  color: var(--muted);
+  border: 1px solid var(--line);
+  border-radius: 6px;
+  padding: 4px 8px;
+}
+
+.calc-line {
+  display: flex;
+  align-items: baseline;
+  justify-content: space-between;
+  gap: 8px;
+  font-family: var(--mono);
+}
+.calc-line .ex { font-size: 12.5px; color: var(--muted); }
+.calc-line .rs { font-size: 14px; font-weight: 700; color: var(--ink); }
+
+.cal-strip { display: grid; grid-template-columns: repeat(7, 1fr); gap: 5px; }
+.cal-strip div {
+  background: var(--canvas);
+  border: 1px solid var(--line);
+  border-radius: 8px;
+  padding: 7px 4px 6px;
+  text-align: center;
+  font-family: var(--mono);
+  font-size: 10px;
+  color: var(--muted);
+}
+.cal-strip div b { display: block; font-size: 11px; color: var(--ink); font-weight: 700; }
+.cal-strip div em { display: block; font-style: normal; font-size: 8.5px; margin-top: 3px; }
+.cal-strip em.m { color: var(--minus); }
+.cal-strip em.p { color: var(--plus); }
+.cal-strip div.on { border-color: rgba(91, 75, 214, .35); background: var(--accent-wash); }
+
+.sync-line {
+  display: flex;
+  align-items: center;
+  gap: 9px;
+  color: var(--muted);
+}
+.sync-line .dots { flex: 1; height: 1px; background: repeating-linear-gradient(90deg, var(--line) 0 4px, transparent 4px 8px); }
+.sync-line svg { width: 16px; height: 16px; }
+.sync-line .cloud { color: var(--accent); }
+
+.perm { display: grid; grid-template-columns: repeat(2, minmax(0, 1fr)); gap: 7px; }
+.switch {
+  width: 30px; height: 18px;
+  border-radius: 999px;
+  background: rgba(23, 22, 28, .14);
   position: relative;
   flex-shrink: 0;
 }
-.toggle::after {
+.switch::after {
   content: "";
   position: absolute;
   top: 2px; left: 2px;
-  width: 16px; height: 16px;
+  width: 14px; height: 14px;
   border-radius: 50%;
   background: #fff;
 }
-.toggle.on { background: var(--primary); }
-.toggle.on::after { left: auto; right: 2px; }
+.switch.on { background: var(--accent); }
+.switch.on::after { left: auto; right: 2px; }
 
-/* ───────── 가이드 ───────── */
-.guide { background: #fff; }
-.steps {
+/* ═════════ 시작 가이드 ═════════ */
+.guide { background: var(--surface); border-top: 1px solid var(--line); }
+.guide-grid {
   display: grid;
-  grid-template-columns: repeat(auto-fit, minmax(240px, 1fr));
-  gap: 20px;
-  counter-reset: step;
+  grid-template-columns: minmax(0, .82fr) minmax(0, 1.18fr);
+  gap: clamp(32px, 5vw, 72px);
+  align-items: start;
 }
-.step {
-  background: var(--bg);
-  border-radius: 18px;
-  padding: 30px 26px;
-  position: relative;
-  transition: transform .3s ease, background .3s ease;
-}
-.step:hover { transform: translateY(-6px); background: #F3F0FF; }
-.step-num {
-  counter-increment: step;
-  width: 38px; height: 38px;
-  border-radius: 50%;
-  background: var(--primary);
-  color: #fff;
-  display: flex;
-  align-items: center;
-  justify-content: center;
+.guide-grid h2 {
+  font-size: clamp(1.85rem, 3.4vw, 2.7rem);
   font-weight: 800;
-  font-size: 15px;
-  margin-bottom: 16px;
-  transition: transform .3s cubic-bezier(.34,1.56,.64,1), background .3s ease;
+  letter-spacing: -.035em;
+  line-height: 1.2;
+  margin-top: 14px;
+  word-break: keep-all;
 }
-.step-num::before { content: counter(step); }
-.step:hover .step-num { transform: scale(1.18); background: var(--primary-deep); }
-.step h4 { font-size: 17px; font-weight: 800; margin-bottom: 6px; }
-.step p { font-size: 14px; color: var(--ink-soft); word-break: keep-all; }
-
-/* ───────── CTA ───────── */
-.cta-section { padding-bottom: 120px; }
-.cta {
-  background:
-    radial-gradient(600px 300px at 80% 0%, rgba(255,209,102,.15), transparent 60%),
-    linear-gradient(135deg, var(--primary-dark), var(--primary-deep) 60%, var(--primary));
-  color: #fff;
-  text-align: center;
-  border-radius: 28px;
-  max-width: 1060px;
-  margin: 0 auto;
-  padding: 72px 32px;
-  position: relative;
-  overflow: hidden;
+.steps { display: flex; flex-direction: column; }
+.step {
+  display: grid;
+  grid-template-columns: 46px minmax(0, 1fr);
+  gap: 18px;
+  padding: 26px 0;
+  border-top: 1px solid var(--line);
+  transition: transform .3s var(--ease);
 }
-.cta h2 { font-size: clamp(26px, 3.4vw, 34px); font-weight: 800; letter-spacing: -0.02em; margin-bottom: 12px; word-break: keep-all; }
-.cta p { opacity: .82; margin-bottom: 32px; font-size: 16px; word-break: keep-all; }
-.cta .hero-cta-row { justify-content: center; margin-bottom: 0; }
+.step:last-child { border-bottom: 1px solid var(--line); }
+.step:hover { transform: translateX(5px); }
+.step .n {
+  font-family: var(--mono);
+  font-size: 12px;
+  font-weight: 500;
+  color: var(--accent);
+  letter-spacing: .1em;
+  padding-top: 3px;
+}
+.step h4 { font-size: 1.0625rem; font-weight: 700; letter-spacing: -.02em; margin-bottom: 5px; }
+.step p { font-size: .9rem; line-height: 1.7; color: var(--muted); word-break: keep-all; }
 
+/* ═════════ 푸터 ═════════ */
 footer {
-  text-align: center;
-  padding: 44px 24px;
-  font-size: 13px;
-  color: var(--ink-soft);
+  background: var(--shell);
+  color: rgba(255, 255, 255, .5);
+  padding: 46px 0;
 }
-footer b { color: var(--primary); }
+.foot {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  gap: 20px;
+  flex-wrap: wrap;
+}
+.foot .brand { font-size: 15px; }
+.foot .tech { font-family: var(--mono); font-size: 11px; letter-spacing: .08em; color: rgba(255, 255, 255, .34); }
 
-/* ───────── 반응형 ───────── */
-/* 좁은 화면: 폰 위에 2열 그리드로 6개 전부 노출 (가로 스크롤 없음) */
-@media (max-width: 880px) {
-  .showcase { display: flex; flex-direction: column; align-items: center; gap: 28px; }
-  .feature-tabs {
-    display: grid;
-    grid-template-columns: repeat(2, minmax(0, 1fr));
-    gap: 10px;
-    width: 100%;
-  }
-  .tabcol { display: contents; }
-  .ftab, .tabcol:nth-of-type(2) .ftab {
-    text-align: left;
-    border-left: 4px solid transparent;
-    border-right: 1px solid rgba(108,92,231,.1);
-    padding: 12px 14px 10px;
-  }
-  .ftab.is-active, .tabcol:nth-of-type(2) .ftab.is-active {
-    border-left-color: var(--primary);
-    border-right-color: rgba(108,92,231,.1);
-  }
-  .tabcol:nth-of-type(2) .ft-title { flex-direction: row; }
-  .ftab .ft-sub, .ftab-bar { display: none; }
-  .ftab:hover, .tabcol:nth-of-type(2) .ftab:hover { transform: none; }
+/* ═════════ 반응형 ═════════ */
+@media (max-width: 980px) {
+  .hero { padding-top: 132px; }
+  .hero-grid { grid-template-columns: 1fr; gap: 48px; }
+  .hero p.lead { max-width: 46ch; }
+  .device-col { justify-content: flex-start; }
+  .bento { grid-template-columns: repeat(2, minmax(0, 1fr)); }
+  .t-auto { grid-column: span 2; grid-row: span 1; }
+  .t-repeat, .t-view, .t-privacy { grid-column: span 2; }
+  .sec-head { grid-template-columns: 1fr; gap: 14px; align-items: start; }
+  .guide-grid { grid-template-columns: 1fr; }
 }
-@media (max-width: 520px) {
-  .feature-tabs { grid-template-columns: 1fr; }
+@media (max-width: 700px) {
+  .topbar { padding: 16px; }
+  .topbar nav { gap: 18px; }
+  .bento { grid-template-columns: 1fr; }
+  .t-auto, .t-repeat, .t-calc, .t-sync, .t-view, .t-privacy { grid-column: span 1; }
+  .device-col { justify-content: center; }
+  .hero-meta { flex-wrap: wrap; gap: 20px 30px; }
+  .perm { grid-template-columns: 1fr; }
+  .cal-strip { grid-template-columns: repeat(4, 1fr); }
 }
-@media (max-width: 640px) {
-  .hero { padding: 116px 20px 90px; }
-  section { padding: 72px 20px; }
-  .hero-desc { font-size: 16px; }
+@media (max-width: 380px) {
+  .device { width: 100%; }
 }
 
-/* ───────── 모션 감소 설정 존중 ───────── */
 @media (prefers-reduced-motion: reduce) {
   html { scroll-behavior: auto; }
   *, *::before, *::after {
@@ -745,315 +651,311 @@ footer b { color: var(--primary); }
     transition-duration: .01ms !important;
   }
   .js .reveal { opacity: 1; transform: none; }
-  .notif, .entry.auto { animation: none; }
-  .entry.auto { max-height: none; }
-  .notif { display: none; }
+  .notif { animation: none; }
+  .row.landed { animation: none; max-height: none; }
 }
 </style>
 </head>
 <body>
 
-<!-- ═════════ 고정 헤더 ═════════ -->
-<header class="topbar">
-  <a class="logo" href="#top">V-<span>Flux</span></a>
+<!-- ═════════ 상단 바 ═════════ -->
+<header class="topbar" id="topbar">
+  <a class="brand" href="#top">
+    <span class="mark" aria-hidden="true">
+      <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round"><path d="M4 6h16M4 12h11M4 18h6"/></svg>
+    </span>
+    V-Flux
+  </a>
   <nav>
-    <a href="#features">주요특징</a>
+    <a href="#features">주요 기능</a>
     <a href="#guide">시작 가이드</a>
-    <a class="nav-cta" href="https://github.com/KoHyeonSeo/V-Flux">GitHub</a>
+    <!-- [임시 숨김] GitHub 링크 — 복구하려면 아래 한 줄의 주석을 해제하세요
+    <a href="https://github.com/KoHyeonSeo/V-Flux">GitHub</a>
+    -->
   </nav>
 </header>
 
 <!-- ═════════ 히어로 ═════════ -->
 <section class="hero" id="top">
-  <div class="hero-inner">
+  <div class="wrap hero-grid">
     <div class="hero-copy">
-      <span class="eyebrow">V-FLUX · 가계부</span>
-      <h1>자산의 흐름,<br>이제는 <mark>똑똑하게</mark> 관리하자</h1>
-      <p class="hero-desc">
-        카드 승인 문자와 은행 알림을 자동으로 감지해 스스로 기록되는 가계부.
-        기록은 V-Flux에게 맡기고, 소비 흐름만 확인하세요.
+      <span class="eyebrow">가계부 · 자동 기록</span>
+      <h1>자산의 흐름,<br>이제는 <em>똑똑하게</em> 관리하자</h1>
+      <p class="lead">
+        카드 승인 문자와 은행 입출금 알림을 기기 안에서 읽어
+        금액·사용처·일시만 뽑아 기록합니다. 손으로 적는 단계를 없앴습니다.
       </p>
-      <div class="hero-cta-row">
-        <a class="btn-primary" href="#features">주요 기능 보기</a>
-        <a class="btn-ghost" href="#guide">3분 시작 가이드</a>
-      </div>
-      <div class="hero-badges">
-        <span class="badge">문자·알림 자동 감지</span>
-        <span class="badge">원문 미저장</span>
-        <span class="badge">국내 9개 카드사</span>
-        <span class="badge">클라우드 동기화</span>
-      </div>
+      <a class="cta" href="#features">
+        주요 기능 살펴보기
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M5 12h14M13 6l6 6-6 6"/></svg>
+      </a>
+      <dl class="hero-meta">
+        <div>
+          <dt>지원 카드사</dt>
+          <dd>국내 9개사 · 연관 은행</dd>
+        </div>
+        <div>
+          <dt>문자 원문</dt>
+          <dd>저장·전송하지 않음</dd>
+        </div>
+        <div>
+          <dt>플랫폼</dt>
+          <dd>Android</dd>
+        </div>
+      </dl>
     </div>
 
-    <div class="phone-wrap">
-      <div class="phone">
+    <div class="device-col">
+      <div class="device">
         <div class="screen">
-          <div class="notif">
-            <div class="n-icon">💳</div>
-            <div class="n-body"><b>신한카드 승인</b><span>4,500원 스타벅스 08/05 17:38</span></div>
+          <div class="sbar">
+            <span>17:38</span>
+            <span class="sig" aria-hidden="true">
+              <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round"><path d="M4 18v-3M10 18v-7M16 18v-11M22 18V4"/></svg>
+              <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8"><rect x="2" y="8" width="17" height="9" rx="2.5"/><path d="M21.5 11.5v3" stroke-linecap="round"/><rect x="4" y="10" width="11" height="5" rx="1" fill="currentColor" stroke="none"/></svg>
+            </span>
           </div>
-          <div class="statusbar"><span>17:38</span><span>📶 🔋</span></div>
-          <div class="screen-header">
-            <div class="t">가계부</div>
-            <div class="s">수입/지출을 한눈에 확인하고 빠르게 기록하세요</div>
+          <div class="shead">
+            <div class="h">가계부</div>
+            <div class="s">2026.08</div>
           </div>
-          <div class="screen-body">
-            <div class="month-card">
-              <div><div class="lb">이번 달</div><div class="vl num" id="countup">+2,220,181원</div></div>
-              <div><div class="lb">수입</div><div class="vl plus num">+4,007,324원</div></div>
-              <div><div class="lb">지출</div><div class="vl minus num">-1,787,143원</div></div>
+          <div class="sbody">
+            <dl class="summary">
+              <div><dt>이번 달</dt><dd class="num" id="countup">+2,220,181원</dd></div>
+              <div><dt>수입</dt><dd class="num p">+4,007,324원</dd></div>
+              <div><dt>지출</dt><dd class="num m">-1,787,143원</dd></div>
+            </dl>
+
+            <div class="notif-slot">
+              <div class="notif">
+                <span class="ic" aria-hidden="true">
+                  <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M21 15a2 2 0 0 1-2 2H7l-4 4V5a2 2 0 0 1 2-2h14a2 2 0 0 1 2 2z"/></svg>
+                </span>
+                <span>
+                  <b>신한카드 승인</b>
+                  <span class="num">4,500원 · 스타벅스</span>
+                </span>
+              </div>
             </div>
-            <div class="entry auto">
-              <span class="chip out">지출</span>
-              <span class="name">커피<small>자동 감지 · 신한카드 · 문자</small></span>
-              <span class="tag-auto">자동</span>
-              <span class="amt minus num">-4,500원</span>
+
+            <div class="row landed">
+              <span class="tag out">지출</span>
+              <span class="nm">커피<i>신한카드 · 문자 감지</i></span>
+              <span class="auto-badge">AUTO</span>
+              <span class="amt m num">-4,500원</span>
             </div>
-            <div class="entry">
-              <span class="chip in">수입</span>
-              <span class="name">월급</span>
-              <span class="amt plus num">+4,007,324원</span>
+            <div class="row">
+              <span class="tag in">수입</span>
+              <span class="nm">월급<i>2026-07-25</i></span>
+              <span class="amt p num">+4,007,324원</span>
             </div>
-            <div class="entry">
-              <span class="chip out">지출</span>
-              <span class="name">월세, 공과금<small>매월 21일 · 반복</small></span>
-              <span class="amt minus num">-605,000원</span>
-            </div>
-            <div class="entry">
-              <span class="chip out">지출</span>
-              <span class="name">AI<small>GPT PRO 결제</small></span>
-              <span class="amt minus num">-58,262원</span>
+            <div class="row">
+              <span class="tag out">지출</span>
+              <span class="nm">월세, 공과금<i>매월 21일 · 반복</i></span>
+              <span class="amt m num">-605,000원</span>
             </div>
           </div>
-          <div class="home-indicator"></div>
+          <div class="home-bar"></div>
         </div>
       </div>
     </div>
   </div>
 </section>
 
-<!-- ═════════ 주요특징: 탭 쇼케이스 ═════════ -->
+<!-- ═════════ 주요 기능 ═════════ -->
 <section id="features">
-  <div class="section-inner">
-    <div class="section-head reveal">
-      <span class="eyebrow">FEATURES</span>
-      <h2 class="section-title">주요<span class="hl">특징</span></h2>
-      <p class="section-sub">쓰기만 하던 가계부는 끝 — 기능을 눌러 화면으로 확인하세요.</p>
+  <div class="wrap">
+    <div class="sec-head reveal">
+      <div>
+        <span class="eyebrow">주요 기능</span>
+        <h2>기록하는 가계부에서<br>기록되는 가계부로</h2>
+      </div>
+      <p>여섯 가지 기능이 하나의 흐름으로 이어집니다. 감지해서 적고, 반복을 미리 깔고, 흐름을 확인합니다.</p>
     </div>
 
-    <div class="showcase reveal">
-      <div class="feature-tabs" role="tablist" aria-label="주요 기능" aria-orientation="vertical">
-       <div class="tabcol" role="presentation">
-        <button class="ftab is-active" role="tab" aria-selected="true" aria-controls="panel-0" id="tab-0">
-          <span class="ft-title"><span class="ft-icon">🤖</span>카드·은행 자동입력</span>
-          <span class="ft-sub">결제 문자·알림을 감지해 스스로 기입해요</span>
-          <span class="ftab-bar"><i></i></span>
-        </button>
-        <button class="ftab" role="tab" aria-selected="false" aria-controls="panel-1" id="tab-1">
-          <span class="ft-title"><span class="ft-icon">🔁</span>반복 수입·지출</span>
-          <span class="ft-sub">월세·구독료는 주기와 기간만 정하면 끝</span>
-          <span class="ftab-bar"><i></i></span>
-        </button>
-        <button class="ftab" role="tab" aria-selected="false" aria-controls="panel-2" id="tab-2">
-          <span class="ft-title"><span class="ft-icon">🧮</span>입력란 속 계산기</span>
-          <span class="ft-sub">금액 칸에서 바로 계산하고 그대로 적용</span>
-          <span class="ftab-bar"><i></i></span>
-        </button>
-       </div>
-       <div class="tabcol" role="presentation">
-        <button class="ftab" role="tab" aria-selected="false" aria-controls="panel-3" id="tab-3">
-          <span class="ft-title"><span class="ft-icon">📅</span>리스트 &amp; 캘린더</span>
-          <span class="ft-sub">한 달의 소비 흐름이 한 화면에 들어와요</span>
-          <span class="ftab-bar"><i></i></span>
-        </button>
-        <button class="ftab" role="tab" aria-selected="false" aria-controls="panel-4" id="tab-4">
-          <span class="ft-title"><span class="ft-icon">☁️</span>클라우드 동기화</span>
-          <span class="ft-sub">Google 로그인 — 기기를 바꿔도 그대로</span>
-          <span class="ftab-bar"><i></i></span>
-        </button>
-        <button class="ftab" role="tab" aria-selected="false" aria-controls="panel-5" id="tab-5">
-          <span class="ft-title"><span class="ft-icon">🔒</span>개인정보 보호</span>
-          <span class="ft-sub">문자 원문 미저장 — 분석은 기기 안에서만</span>
-          <span class="ftab-bar"><i></i></span>
-        </button>
-       </div>
-      </div>
-
-      <div class="showcase-phone">
-        <div class="phone">
-          <div class="screen">
-            <div class="statusbar"><span>17:38</span><span>📶 🔋</span></div>
-            <div class="screen-header">
-              <div class="t">가계부</div>
-              <div class="s">V-Flux</div>
-            </div>
-            <div class="screen-body">
-
-              <div class="fpanel is-active" role="tabpanel" id="panel-0" aria-labelledby="tab-0">
-                <div class="mini-notif">💬 <span><b>[Web발신] 신한카드 승인</b><br>4,500원 일시불 스타벅스</span></div>
-                <div class="flow-arrow">▼ 자동 분석</div>
-                <div class="entry">
-                  <span class="chip out">지출</span>
-                  <span class="name">커피<small>자동 감지 · 신한카드 · 문자</small></span>
-                  <span class="tag-auto">자동</span>
-                  <span class="amt minus num">-4,500원</span>
-                </div>
-                <div class="entry">
-                  <span class="chip out">지출</span>
-                  <span class="name">고현서<small>자동 감지 · 신한은행 · 문자</small></span>
-                  <span class="tag-auto">자동</span>
-                  <span class="amt minus num">-100원</span>
-                </div>
-                <div class="card-chips">
-                  <span class="cchip">신한</span><span class="cchip">KB국민</span><span class="cchip">현대</span>
-                  <span class="cchip">삼성</span><span class="cchip">하나</span><span class="cchip">BC</span><span class="cchip">+3</span>
-                </div>
-              </div>
-
-              <div class="fpanel" role="tabpanel" id="panel-1" aria-labelledby="tab-1">
-                <div class="form-row"><div class="fl">반복 주기</div><div class="fv">매월 21일</div></div>
-                <div class="form-row"><div class="fl">적용 기간</div><div class="fv num">2026/8/20 ~ 2028/3/25</div></div>
-                <div class="flow-arrow">▼ 저장 즉시 반영</div>
-                <div class="entry">
-                  <span class="chip out">지출</span>
-                  <span class="name">월세, 공과금<small>2026-08-21</small></span>
-                  <span class="amt minus num">-605,000원</span>
-                </div>
-                <div class="entry">
-                  <span class="chip out">지출</span>
-                  <span class="name">월세, 공과금<small>2026-09-21</small></span>
-                  <span class="amt minus num">-605,000원</span>
-                </div>
-                <div class="entry">
-                  <span class="chip out">지출</span>
-                  <span class="name">월세, 공과금<small>2026-10-21</small></span>
-                  <span class="amt minus num">-605,000원</span>
-                </div>
-              </div>
-
-              <div class="fpanel" role="tabpanel" id="panel-2" aria-labelledby="tab-2">
-                <div class="calc-field">
-                  <div class="expr num">3,900 × 5</div>
-                  <div class="res num">= 19,500원</div>
-                </div>
-                <div class="keypad">
-                  <div class="key op">C</div><div class="key op">⌫</div><div class="key op">÷</div><div class="key op">×</div>
-                  <div class="key">7</div><div class="key">8</div><div class="key">9</div><div class="key op">−</div>
-                  <div class="key">4</div><div class="key">5</div><div class="key">6</div><div class="key op">+</div>
-                  <div class="key">1</div><div class="key">2</div><div class="key">3</div><div class="key eq">=</div>
-                  <div class="key">0</div><div class="key">00</div><div class="key op">·</div>
-                </div>
-                <div class="apply-btn">금액에 적용</div>
-              </div>
-
-              <div class="fpanel" role="tabpanel" id="panel-3" aria-labelledby="tab-3">
-                <div class="segment"><div>리스트</div><div class="on">캘린더</div></div>
-                <div class="month-card">
-                  <div><div class="lb">이번 달</div><div class="vl num">-697,942원</div></div>
-                  <div><div class="lb">수입</div><div class="vl plus num">+0원</div></div>
-                  <div><div class="lb">지출</div><div class="vl minus num">-697,942원</div></div>
-                </div>
-                <div class="calgrid">
-                  <div class="dow">일</div><div class="dow">월</div><div class="dow">화</div><div class="dow">수</div><div class="dow">목</div><div class="dow">금</div><div class="dow">토</div>
-                  <div class="cal-cell"></div><div class="cal-cell"></div><div class="cal-cell"></div><div class="cal-cell"></div><div class="cal-cell"></div><div class="cal-cell"></div><div class="cal-cell">1</div>
-                  <div class="cal-cell">2</div><div class="cal-cell">3<em class="e">-73,442</em></div><div class="cal-cell">4<em class="e">-19,500</em></div><div class="cal-cell today">5</div><div class="cal-cell">6</div><div class="cal-cell">7</div><div class="cal-cell">8</div>
-                  <div class="cal-cell">9</div><div class="cal-cell">10</div><div class="cal-cell">11</div><div class="cal-cell">12</div><div class="cal-cell">13</div><div class="cal-cell">14</div><div class="cal-cell">15</div>
-                  <div class="cal-cell">16</div><div class="cal-cell">17</div><div class="cal-cell">18</div><div class="cal-cell">19</div><div class="cal-cell">20</div><div class="cal-cell">21<em class="e">-605,000</em></div><div class="cal-cell">22</div>
-                  <div class="cal-cell">23</div><div class="cal-cell">24</div><div class="cal-cell">25<em class="i">+4,007,324</em></div><div class="cal-cell">26</div><div class="cal-cell">27</div><div class="cal-cell">28</div><div class="cal-cell">29</div>
-                </div>
-              </div>
-
-              <div class="fpanel" role="tabpanel" id="panel-4" aria-labelledby="tab-4">
-                <div class="sync-box">
-                  <div class="sync-logo">V-Flux</div>
-                  <div class="gbtn"><span class="g">G</span> Google 계정으로 계속하기</div>
-                  <div class="sync-line">📱<span class="dotline"></span>☁️<span class="dotline"></span>💻</div>
-                  <div class="sync-ok">✓ 실시간 동기화 완료</div>
-                </div>
-              </div>
-
-              <div class="fpanel" role="tabpanel" id="panel-5" aria-labelledby="tab-5">
-                <div class="perm-row">
-                  <span>카드·은행 거래 문자<small>금액·사용처·일시만 분석 · 원문 미저장</small></span>
-                  <span class="pill-ok">허용됨</span>
-                </div>
-                <div class="perm-row">
-                  <span>감지 결과 알림<small>결제 감지 시 V-Flux 알림 표시</small></span>
-                  <span class="pill-ok">허용됨</span>
-                </div>
-                <div class="perm-row">
-                  <span>신한카드<small class="ok">앱 설치됨 · 카드·연관 은행 문자 감지</small></span>
-                  <span class="toggle on"></span>
-                </div>
-                <div class="perm-row">
-                  <span>하나카드<small class="ok">앱 설치됨 · 카드·연관 은행 문자 감지</small></span>
-                  <span class="toggle on"></span>
-                </div>
-                <div class="perm-row">
-                  <span>KB국민카드<small>앱 미설치</small></span>
-                  <span class="toggle"></span>
-                </div>
-              </div>
-
-            </div>
-            <div class="home-indicator"></div>
+    <div class="bento">
+      <article class="tile t-auto reveal" style="--d:0ms">
+        <div class="tile-ic" aria-hidden="true">
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="M21 15a2 2 0 0 1-2 2H7l-4 4V5a2 2 0 0 1 2-2h14a2 2 0 0 1 2 2z"/><path d="M13 7l-3 4h4l-3 4"/></svg>
+        </div>
+        <div class="idx">01</div>
+        <h3>카드·은행 자동입력</h3>
+        <p>카드 승인 문자와 연관 은행의 입출금 알림을 감지해 가계부에 바로 올립니다. SMS 권한이 제한된 기기에서는 메시지 앱 알림으로 읽습니다.</p>
+        <div class="visual">
+          <div class="mini dashed">
+            <span class="lbl">[Web발신] 신한카드 승인<i>4,500원 일시불 스타벅스</i></span>
+          </div>
+          <div class="flow">
+            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M12 5v14M6 13l6 6 6-6"/></svg>
+            기기 내 분석
+          </div>
+          <div class="mini">
+            <span class="tag out">지출</span>
+            <span class="lbl">커피<i>신한카드 · 문자 감지</i></span>
+            <span class="val" style="color:var(--minus)">-4,500원</span>
+          </div>
+          <div class="chips">
+            <span>신한</span><span>KB국민</span><span>현대</span><span>삼성</span><span>롯데</span>
+            <span>하나</span><span>우리</span><span>NH농협</span><span>BC</span>
           </div>
         </div>
-        <p class="panel-note" id="panel-note">신한 · KB국민 · 현대 · 삼성 · 롯데 · 하나 · 우리 · NH농협 · BC 카드와 연관 은행 문자를 지원해요.</p>
-      </div>
+      </article>
+
+      <article class="tile t-repeat reveal" style="--d:70ms">
+        <div class="tile-ic" aria-hidden="true">
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="M17 2l4 4-4 4"/><path d="M3 11V9a4 4 0 0 1 4-4h14"/><path d="M7 22l-4-4 4-4"/><path d="M21 13v2a4 4 0 0 1-4 4H3"/></svg>
+        </div>
+        <div class="idx">02</div>
+        <h3>반복 수입·지출</h3>
+        <p>월세·구독료·월급처럼 되풀이되는 항목은 주기와 적용 기간만 정하면, 저장하는 즉시 그 기간의 내역이 한 번에 깔립니다.</p>
+        <div class="visual">
+          <div class="mini">
+            <span class="lbl">월세, 공과금<i>매월 21일 · 2026.08 ~ 2028.03</i></span>
+            <span class="val" style="color:var(--minus)">-605,000원</span>
+          </div>
+          <div class="chips">
+            <span>매일</span><span>매주</span><span>매월</span><span>시작일·마감일 포함</span>
+          </div>
+        </div>
+      </article>
+
+      <article class="tile t-calc reveal" style="--d:140ms">
+        <div class="tile-ic" aria-hidden="true">
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><rect x="4" y="2" width="16" height="20" rx="2.5"/><path d="M8 6h8M8 11h.01M12 11h.01M16 11h.01M8 15h.01M12 15h.01M16 15v4M8 19h4"/></svg>
+        </div>
+        <div class="idx">03</div>
+        <h3>입력란 속 계산기</h3>
+        <p>더치페이도 앱을 벗어나지 않고 금액 칸에서 바로 계산해 적용합니다.</p>
+        <div class="visual">
+          <div class="mini">
+            <span class="calc-line" style="flex:1">
+              <span class="ex">3,900 × 5</span>
+              <span class="rs">19,500</span>
+            </span>
+          </div>
+        </div>
+      </article>
+
+      <article class="tile t-sync reveal" style="--d:210ms">
+        <div class="tile-ic" aria-hidden="true">
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="M17.5 19a4.5 4.5 0 0 0 0-9 6 6 0 0 0-11.6 1.5A3.5 3.5 0 0 0 6.5 19z"/></svg>
+        </div>
+        <div class="idx">04</div>
+        <h3>클라우드 동기화</h3>
+        <p>Google 계정으로 로그인하면 기록이 안전하게 백업되어 기기를 바꿔도 이어집니다.</p>
+        <div class="visual">
+          <div class="sync-line" aria-hidden="true">
+            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linejoin="round"><rect x="6" y="2" width="12" height="20" rx="2.5"/><path d="M11 18h2" stroke-linecap="round"/></svg>
+            <span class="dots"></span>
+            <svg class="cloud" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round"><path d="M17.5 19a4.5 4.5 0 0 0 0-9 6 6 0 0 0-11.6 1.5A3.5 3.5 0 0 0 6.5 19z"/></svg>
+            <span class="dots"></span>
+            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linejoin="round"><rect x="6" y="2" width="12" height="20" rx="2.5"/><path d="M11 18h2" stroke-linecap="round"/></svg>
+          </div>
+        </div>
+      </article>
+
+      <article class="tile t-view reveal" style="--d:280ms">
+        <div class="tile-ic" aria-hidden="true">
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><rect x="3" y="5" width="18" height="16" rx="2.5"/><path d="M3 10h18M8 3v4M16 3v4"/></svg>
+        </div>
+        <div class="idx">05</div>
+        <h3>리스트 &amp; 캘린더</h3>
+        <p>월별 합계를 상단에서 확인하고, 리스트와 캘린더 두 방식으로 한 달의 소비 흐름을 살펴봅니다.</p>
+        <div class="visual">
+          <div class="cal-strip">
+            <div><b>03</b><em class="m">-73,442</em></div>
+            <div><b>04</b><em class="m">-19,500</em></div>
+            <div class="on"><b>05</b><em>·</em></div>
+            <div><b>06</b><em>·</em></div>
+            <div><b>21</b><em class="m">-605,000</em></div>
+            <div><b>25</b><em class="p">+4,007,324</em></div>
+            <div><b>29</b><em class="m">-11,900</em></div>
+          </div>
+        </div>
+      </article>
+
+      <article class="tile t-privacy reveal" style="--d:350ms">
+        <div class="tile-ic" aria-hidden="true">
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="M12 3l7.5 3.2v5c0 4.6-3.2 8.8-7.5 10.3C7.7 20 4.5 15.8 4.5 11.2v-5z"/><path d="M9 12l2 2 4-4"/></svg>
+        </div>
+        <div class="idx">06</div>
+        <h3>개인정보 보호</h3>
+        <p>문자에서 금액·사용처·일시만 분석하고 원문은 저장하거나 서버로 보내지 않습니다. 감지할 카드사도 직접 고릅니다.</p>
+        <div class="visual perm">
+          <div class="mini">
+            <span class="lbl">신한카드<i>카드·연관 은행 감지</i></span>
+            <span class="switch on" aria-hidden="true"></span>
+          </div>
+          <div class="mini">
+            <span class="lbl">KB국민카드<i>앱 미설치</i></span>
+            <span class="switch" aria-hidden="true"></span>
+          </div>
+        </div>
+      </article>
     </div>
   </div>
 </section>
 
 <!-- ═════════ 시작 가이드 ═════════ -->
 <section class="guide" id="guide">
-  <div class="section-inner">
-    <div class="section-head reveal">
-      <span class="eyebrow">GET STARTED</span>
-      <h2 class="section-title">3분이면 충분한 <span class="hl">시작 가이드</span></h2>
-      <p class="section-sub">복잡한 설정 없이 바로 기록을 시작하세요.</p>
+  <div class="wrap guide-grid">
+    <div class="reveal">
+      <span class="eyebrow">시작 가이드</span>
+      <h2>세 단계면<br>설정이 끝납니다</h2>
     </div>
     <div class="steps">
       <div class="step reveal" style="--d:0ms">
-        <div class="step-num"></div>
-        <h4>로그인</h4>
-        <p>이메일 또는 Google 계정으로 로그인하면 나만의 가계부가 준비됩니다.</p>
+        <span class="n">01</span>
+        <div>
+          <h4>로그인</h4>
+          <p>이메일 또는 Google 계정으로 로그인하면 나만의 가계부가 준비됩니다.</p>
+        </div>
       </div>
-      <div class="step reveal" style="--d:90ms">
-        <div class="step-num"></div>
-        <h4>자동입력 켜기</h4>
-        <p>가계부 &gt; 자동입력에서 사용 중인 카드사를 켜면 결제 알림이 자동으로 기입됩니다.</p>
+      <div class="step reveal" style="--d:70ms">
+        <span class="n">02</span>
+        <div>
+          <h4>자동입력 켜기</h4>
+          <p>가계부 &gt; 자동입력에서 감지 권한을 허용하고, 사용 중인 카드사를 켭니다.</p>
+        </div>
       </div>
-      <div class="step reveal" style="--d:180ms">
-        <div class="step-num"></div>
-        <h4>흐름 확인</h4>
-        <p>리스트·캘린더 뷰에서 월별 수입·지출 흐름을 한눈에 확인하세요.</p>
+      <div class="step reveal" style="--d:140ms">
+        <span class="n">03</span>
+        <div>
+          <h4>흐름 확인</h4>
+          <p>결제가 쌓이면 리스트와 캘린더에서 월별 수입·지출 흐름을 확인합니다.</p>
+        </div>
       </div>
     </div>
   </div>
 </section>
 
-<!-- ═════════ CTA ═════════ -->
+<!-- [임시 숨김] 마무리 CTA 섹션 — 복구하려면 이 주석 블록만 제거하세요
 <section class="cta-section">
-  <div class="cta reveal">
+  <div class="wrap">
     <h2>기록은 자동으로, 관리는 똑똑하게</h2>
     <p>V-Flux와 함께 오늘부터 소비 흐름을 관리해 보세요.</p>
-    <div class="hero-cta-row">
-      <a class="btn-primary" href="#guide">지금 시작하기</a>
-      <a class="btn-ghost" href="https://github.com/KoHyeonSeo/V-Flux">소스 보기</a>
-    </div>
+    <a class="cta" href="#guide">지금 시작하기</a>
   </div>
 </section>
+-->
 
 <footer>
-  <b>V-Flux</b> · 자산 운용 애플리케이션 · Built with .NET MAUI &amp; Firebase
+  <div class="wrap foot">
+    <span class="brand">
+      <span class="mark" aria-hidden="true">
+        <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round"><path d="M4 6h16M4 12h11M4 18h6"/></svg>
+      </span>
+      V-Flux
+    </span>
+    <span class="tech">.NET MAUI · FIREBASE</span>
+  </div>
 </footer>
 
 <script>
 (() => {
   const reduced = matchMedia('(prefers-reduced-motion: reduce)').matches;
 
-  /* ── 스크롤 리빌 ── */
+  /* 스크롤 진입 */
   const els = document.querySelectorAll('.reveal');
   if (!('IntersectionObserver' in window) || reduced) {
     els.forEach(el => el.classList.add('in'));
@@ -1062,7 +964,7 @@ footer b { color: var(--primary); }
       for (const e of entries) {
         if (e.isIntersecting) { e.target.classList.add('in'); io.unobserve(e.target); }
       }
-    }, { threshold: 0.15, rootMargin: '0px 0px -8% 0px' });
+    }, { threshold: .12, rootMargin: '0px 0px -6% 0px' });
     els.forEach(el => {
       io.observe(el);
       el.addEventListener('transitionend', function done(ev) {
@@ -1074,10 +976,16 @@ footer b { color: var(--primary); }
     });
   }
 
-  /* ── 히어로 합계 카운트업 ── */
+  /* 상단 바 배경 */
+  const bar = document.getElementById('topbar');
+  const onScroll = () => bar.classList.toggle('stuck', scrollY > 24);
+  addEventListener('scroll', onScroll, { passive: true });
+  onScroll();
+
+  /* 월 합계 카운트업 */
   const cu = document.getElementById('countup');
   if (cu && !reduced) {
-    const target = 2220181, dur = 1400, t0 = performance.now();
+    const target = 2220181, dur = 1300, t0 = performance.now();
     (function tick(now) {
       const p = Math.min((now - t0) / dur, 1);
       const eased = 1 - Math.pow(1 - p, 3);
@@ -1085,58 +993,6 @@ footer b { color: var(--primary); }
       if (p < 1) requestAnimationFrame(tick);
     })(t0);
   }
-
-  /* ── 주요특징 탭 쇼케이스 ── */
-  const tablist = document.querySelector('.feature-tabs');
-  const tabs = [...document.querySelectorAll('.ftab')];
-  const panels = [...document.querySelectorAll('.fpanel')];
-  const note = document.getElementById('panel-note');
-  const notes = [
-    '신한 · KB국민 · 현대 · 삼성 · 롯데 · 하나 · 우리 · NH농협 · BC 카드와 연관 은행 문자를 지원해요.',
-    '시작일과 마감일을 모두 포함해 지정 기간의 내역을 미리 등록해요.',
-    '더치페이 계산도 앱을 떠날 필요 없이 그 자리에서 끝내요.',
-    '날짜를 누르면 그날의 상세 내역으로 바로 이동해요.',
-    'Firebase에 안전하게 백업되어 기기를 바꿔도 기록이 그대로예요.',
-    '문자 원문은 저장·전송하지 않고, 사용하는 카드사만 골라 감지할 수 있어요.'
-  ];
-  let idx = 0, manual = false, visible = true;
-  const autoAllowed = () => !manual && visible && !reduced && matchMedia('(min-width: 881px)').matches;
-
-  function activate(i, byUser) {
-    if (byUser && i === idx) { manual = true; tablist.classList.add('manual'); return; }
-    idx = i;
-    tabs.forEach((t, k) => {
-      t.classList.toggle('is-active', k === i);
-      t.setAttribute('aria-selected', k === i);
-    });
-    panels.forEach((p, k) => p.classList.toggle('is-active', k === i));
-    if (note) note.textContent = notes[i];
-    if (byUser) { manual = true; tablist.classList.add('manual'); }
-  }
-
-  tabs.forEach((t, i) => {
-    t.addEventListener('click', () => activate(i, true));
-    t.addEventListener('animationend', () => {
-      if (autoAllowed()) activate((idx + 1) % tabs.length, false);
-    }, true);
-  });
-
-  /* display:contents인 tablist 대신 실제 박스를 가진 .showcase에 연결 */
-  const showcase = document.querySelector('.showcase');
-  showcase.addEventListener('mouseenter', () => { visible = false; });
-  showcase.addEventListener('mouseleave', () => {
-    visible = true;
-    if (autoAllowed()) activate(idx, false); /* 진행바 리스타트 */
-  });
-  if ('IntersectionObserver' in window) {
-    new IntersectionObserver(([e]) => { visible = e.isIntersecting; },
-      { threshold: 0.3 }).observe(showcase);
-  }
-
-  tablist.addEventListener('keydown', e => {
-    if (['ArrowDown','ArrowRight'].includes(e.key)) { e.preventDefault(); activate((idx + 1) % tabs.length, true); tabs[idx].focus(); }
-    if (['ArrowUp','ArrowLeft'].includes(e.key))   { e.preventDefault(); activate((idx - 1 + tabs.length) % tabs.length, true); tabs[idx].focus(); }
-  });
 })();
 </script>
 

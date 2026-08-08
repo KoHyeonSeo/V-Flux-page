@@ -831,62 +831,6 @@ section { padding: var(--pad) 0; }
 .p-sync .arc { flex: 1; height: 1px; background: repeating-linear-gradient(90deg, rgba(108,92,231,.4) 0 3px, transparent 3px 7px); }
 .p-sync .cl { color: var(--accent); }
 .p-sync .cl svg { width: 24px; height: 24px; }
-/* 권한 토글 */
-.p-toggle {
-  display: flex;
-  align-items: center;
-  gap: 9px;
-  background: #fff;
-  border-radius: 13px;
-  padding: 10px 13px;
-  box-shadow: 0 2px 8px rgba(45, 27, 143, .05);
-  font-size: 12px;
-  font-weight: 700;
-  letter-spacing: -.02em;
-}
-.p-toggle + .p-toggle { margin-top: 7px; }
-.p-toggle span:first-child { flex: 1; }
-.p-toggle small { display: block; font-size: 9.5px; font-weight: 500; margin-top: 2px; }
-.p-toggle small.ok { color: #12864F; }
-.p-toggle small.no { color: rgba(23, 22, 28, .42); }
-.p-sw {
-  width: 34px; height: 20px;
-  border-radius: 999px;
-  background: #6C5CE7;
-  position: relative;
-  flex-shrink: 0;
-}
-.p-sw i {
-  position: absolute;
-  top: 2px; left: 2px;
-  width: 16px; height: 16px;
-  border-radius: 50%;
-  background: #fff;
-  transform: translate3d(14px, 0, 0);
-}
-.p-sw.off { background: #B6B3C4; }
-.p-sw.off i { transform: none; }
-.p-allow {
-  font-size: 10px;
-  font-weight: 700;
-  color: #fff;
-  background: #6C5CE7;
-  border-radius: 999px;
-  padding: 5px 11px;
-  flex-shrink: 0;
-  letter-spacing: -.02em;
-}
-/* 문자 원문 먹칠 */
-.p-redact { position: relative; display: inline-block; font-size: 11px; line-height: 1.9; letter-spacing: -.01em; }
-.p-redact .bar {
-  position: absolute;
-  left: -2px; top: 12%;
-  height: 76%;
-  width: 100%;
-  background: #17161C;
-  transform-origin: 0 50%;
-  transform: scaleX(1);
-}
 
 /* ── 시퀀스 (선택 시 1회 재생) ── */
 .paper [class*="sq-"] { animation-duration: var(--seq, 2400ms); animation-fill-mode: both; animation-iteration-count: 1; animation-play-state: paused; }
@@ -925,7 +869,7 @@ section { padding: var(--pad) 0; }
   0%   { opacity: 0; transform: translate3d(0, -9px, 0); }
   100% { opacity: var(--fo, 1); transform: none; }
 }
-.sq-type { animation-name: sqType; animation-timing-function: steps(7, end); }
+.sq-type { animation-name: sqType; animation-timing-function: steps(9, end); }
 @keyframes sqType {
   0%, 12% { transform: scaleX(1); }
   46%     { transform: scaleX(0); }
@@ -960,16 +904,6 @@ section { padding: var(--pad) 0; }
 @keyframes sqRecv {
   0%, 48%  { opacity: 0; transform: translate3d(0, -6px, 0); }
   62%, 100%{ opacity: 1; transform: none; }
-}
-.sq-redact { animation-name: sqRedact; animation-timing-function: cubic-bezier(.2, .9, .1, 1); animation-delay: var(--sd, 0ms); animation-duration: calc(var(--seq, 2400ms) * .12); }
-@keyframes sqRedact {
-  0%   { transform: scaleX(0); }
-  100% { transform: scaleX(1); }
-}
-.sq-lock { animation-name: sqLock; animation-timing-function: var(--ease); }
-@keyframes sqLock {
-  0%, 66%  { opacity: 0; transform: translate3d(0, 7px, 0); }
-  82%, 100%{ opacity: 1; transform: none; }
 }
 
 /* ═════════ 시작 가이드 ═════════ */
@@ -1096,7 +1030,6 @@ footer {
   .paper [class*="sq-"] { animation: none !important; }
   .paper { transform: rotate(-0.7deg) !important; }
   .p-seg .knob { transform: translate3d(100%, 0, 0); }
-  .p-redact .bar { transform: scaleX(1); }
 }
 </style>
 </head>
@@ -1238,9 +1171,6 @@ footer {
       <button class="fx-tab" role="tab" id="t4" aria-controls="p4" aria-selected="false" tabindex="-1">
         <span class="ix">05</span><span class="nm">기기 동기화</span>
       </button>
-      <button class="fx-tab" role="tab" id="t5" aria-controls="p5" aria-selected="false" tabindex="-1">
-        <span class="ix">06</span><span class="nm">원문 미저장</span>
-      </button>
       <span class="fx-ind" aria-hidden="true"></span>
     </div>
 
@@ -1271,11 +1201,6 @@ footer {
           <h3>폰을 바꿔도<br>기록은 그대로 따라와요</h3>
           <p>적어둔 내역은 자동으로 백업돼요. 새 기기에서 로그인만 하면 쓰던 그대로 이어서 쓸 수 있어요.</p>
           <span class="meta">Google 로그인 · 자동 백업</span>
-        </div>
-        <div class="fx-txt" role="tabpanel" id="p5" aria-labelledby="t5" tabindex="0" hidden>
-          <h3>내 문자는<br>폰 밖으로 나가지 않아요</h3>
-          <p>금액과 사용처, 일시만 폰 안에서 읽고 문자 내용은 지웁니다. 어느 카드사를 읽을지도 직접 정할 수 있어요.</p>
-          <span class="meta">문자 원문 저장 안 함 · 카드사별 켜고 끄기</span>
         </div>
       </div>
 
@@ -1360,8 +1285,9 @@ footer {
           </div>
           <div class="p-body">
             <div class="p-field">
-              <div class="p-expr">3,900 × 5<span class="mask sq-type"></span></div>
-              <div class="p-res sq-res">19,500원</div>
+              <div class="p-label" style="margin-bottom:5px">5명이 19,500원을 나눠 낼 때</div>
+              <div class="p-expr">19,500 ÷ 5<span class="mask sq-type"></span></div>
+              <div class="p-res sq-res">3,900원</div>
             </div>
             <div class="p-keys">
               <i class="op">C</i><i class="op">⌫</i><i class="op">÷</i><i class="op">×</i>
@@ -1440,37 +1366,6 @@ footer {
             </div>
           </div>
         </div>
-
-        <!-- 06 개인정보 -->
-        <div class="paper" data-seq="2200">
-          <div class="p-top">
-            <div class="bc">가계부 &gt; 자동입력</div>
-            <div class="t">카드·은행 자동입력</div>
-            <div class="s">카드 승인과 연관 은행의 알림을 감지해요</div>
-          </div>
-          <div class="p-body">
-            <div class="p-label">받은 문자에서</div>
-            <div style="color:rgba(23,22,28,.7)">
-              <span class="p-redact">[Web발신] 신한카드(1234)<span class="bar sq-redact" style="--sd:280ms"></span></span><br>
-              <span class="p-redact">고현서님 4,500원 일시불<span class="bar sq-redact" style="--sd:400ms"></span></span><br>
-              <span class="p-redact">누적 1,787,143원 스타벅스<span class="bar sq-redact" style="--sd:520ms"></span></span>
-            </div>
-            <div class="flowline sq-lock" style="margin-top:12px">금액 · 사용처 · 일시만 남겨요</div>
-            <div class="p-toggle sq-lock">
-              <span>카드·은행 거래 문자<small class="ok">문자 원문은 저장하지 않아요</small></span>
-              <span class="p-allow">허용됨</span>
-            </div>
-            <div class="p-toggle">
-              <span>신한카드<small class="ok">앱 설치됨 · 카드·연관 은행 문자 감지</small></span>
-              <span class="p-sw"><i></i></span>
-            </div>
-            <div class="p-toggle">
-              <span>KB국민카드<small class="no">앱 미설치</small></span>
-              <span class="p-sw off"><i></i></span>
-            </div>
-          </div>
-        </div>
-
       </div>
     </div>
   </div>

@@ -6,7 +6,7 @@
 
 이미지를 누르면 실제 페이지로 이동합니다.
 
-[![V-Flux 소개 페이지 - 히어로](preview-hero.png)](https://kohyeonseo.github.io/V-Flux-page/)
+[![V-Flux 소개 페이지](preview-hero.png)](https://kohyeonseo.github.io/V-Flux-page/)
 
 [![V-Flux 소개 페이지 - 주요 기능](preview-features.png)](https://kohyeonseo.github.io/V-Flux-page/#features)
 
@@ -22,29 +22,3 @@
 V-Flux 앱의 소개 페이지 **한 장**만 담고 있습니다. 앱 소스 코드는 별도의 비공개 저장소에서 관리하며,
 이 저장소는 GitHub Pages 배포만을 목적으로 분리되어 있습니다.
 
-| 파일 | 설명 |
-| --- | --- |
-| `index.html` | 소개 페이지 전체 (HTML · CSS · JS 단일 파일) |
-| `vflux-logo-64.png` | 파비콘 |
-| `preview-*.png` | README용 미리보기 이미지 |
-
-## 페이지 구성
-
-- **히어로** — 앱 아이콘, 슬로건, 실제 앱 화면 목업 (카드 결제 감지 → 내역 기입 데모)
-- **주요 기능** — 다섯 가지 기능을 눌러 실제 앱 화면으로 확인하는 인터랙티브 쇼케이스
-  - 카드 자동입력 · 반복 등록 · 금액 계산 · 캘린더 보기 · 기기 동기화
-- **시작 가이드** — 로그인부터 흐름 확인까지 세 단계
-
-> 위 이미지는 정지 화면입니다. 탭을 눌러 화면이 전환되는 인터랙션은 라이브 페이지에서 확인하세요.
-
-## 기술 메모
-
-- 외부 라이브러리 없이 바닐라 CSS와 JavaScript로만 구현했습니다.
-- 앱 화면 목업은 스크린샷 이미지가 아니라 전부 CSS와 SVG로 그렸습니다.
-- 로고는 CSS 클래스 한 곳에 base64로 인라인되어 페이지가 단일 파일로 완결됩니다.
-- 폰트는 Pretendard(본문)와 JetBrains Mono(금액·날짜)를 사용합니다.
-- `prefers-reduced-motion` 설정을 존중하며, 390px부터 데스크톱까지 대응합니다.
-
-## 배포
-
-`main` 브랜치의 루트가 GitHub Pages로 그대로 배포됩니다. `index.html`을 수정해 푸시하면 반영됩니다.

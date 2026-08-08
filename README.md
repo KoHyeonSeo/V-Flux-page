@@ -2,9 +2,11 @@
 
 > **당신의 자산, 더 똑똑하게 흐르게** — .NET MAUI 기반 자산 운용(가계부) 애플리케이션 V-Flux의 소개 페이지입니다.
 
-### 👉 [https://kohyeonseo.github.io/V-Flux-page/](https://kohyeonseo.github.io/V-Flux-page/)
+<a href="https://kohyeonseo.github.io/V-Flux-page/">
+  <img src="btn-live.png" alt="라이브 페이지 열기 — https://kohyeonseo.github.io/V-Flux-page/" width="340">
+</a>
 
-이미지를 누르면 실제 페이지로 이동합니다.
+아래 이미지를 눌러도 실제 페이지로 이동합니다.
 
 [![V-Flux 소개 페이지](preview-hero.png)](https://kohyeonseo.github.io/V-Flux-page/)
 

@@ -24,7 +24,13 @@
 
   --sans: "Pretendard Variable", Pretendard, -apple-system, BlinkMacSystemFont, "Segoe UI", "Malgun Gothic", sans-serif;
   --mono: "JetBrains Mono", ui-monospace, SFMono-Regular, Menlo, monospace;
-  --ease: cubic-bezier(.22, 1, .36, 1);
+  --ease: cubic-bezier(.22, 1, .36, 1);      /* 감속 — 들어오는 것 */
+  --ease-in: cubic-bezier(.4, 0, 1, 1);      /* 가속 — 나가는 것 */
+  --ease-pop: cubic-bezier(.34, 1.4, .5, 1); /* 미세 오버슈트 — 배지/노브 */
+  --d-press: 110ms;
+  --d-out: 140ms;
+  --d-in: 260ms;
+  --overlap: 90ms;
   --maxw: 1200px;
   --pad: clamp(4.5rem, 9vw, 7.5rem);
 }
@@ -397,162 +403,494 @@ section { padding: var(--pad) 0; }
   padding-bottom: 4px;
 }
 
-/* ═════════ 주요 기능 — 비대칭 벤토 ═════════ */
-.bento {
-  display: grid;
-  grid-template-columns: repeat(4, minmax(0, 1fr));
-  gap: 14px;
+/* ═════════ 주요 기능 — 어두운 면 위의 영수증 ═════════ */
+.feat {
+  background: var(--shell);
+  color: #F2F1F5;
+  padding: var(--pad) 0;
 }
-.tile {
-  background: var(--surface);
-  border: 1px solid var(--line);
-  border-radius: 20px;
-  padding: 24px;
+.feat .sec-head h2 { color: #FFFFFF; }
+.feat .sec-head p { color: rgba(242, 241, 245, .52); }
+.feat .eyebrow { color: rgba(242, 241, 245, .5); }
+
+/* ── 인덱스 바 (장부 열 머리글) ── */
+.fx-nav {
+  position: relative;
+  display: flex;
+  gap: 2px;
+  border-bottom: 1px solid rgba(242, 241, 245, .16);
+  margin-bottom: clamp(34px, 4vw, 52px);
+}
+.fx-tab {
+  position: relative;
+  flex: 1 1 0;
+  min-width: 0;
   display: flex;
   flex-direction: column;
-  transition: transform .35s var(--ease), box-shadow .35s var(--ease), border-color .35s var(--ease);
+  justify-content: flex-end;
+  gap: 5px;
+  min-height: 62px;
+  padding: 10px 4px 14px;
+  background: none;
+  border: 0;
+  border-left: 1px solid rgba(242, 241, 245, .1);
+  text-align: left;
+  cursor: pointer;
+  font-family: inherit;
+  color: rgba(242, 241, 245, .44);
+  transition: color .22s var(--ease), transform var(--d-press) var(--ease);
+  -webkit-tap-highlight-color: transparent;
+  touch-action: manipulation;
 }
-.tile:hover {
-  transform: translateY(-3px);
-  border-color: rgba(91, 75, 214, .22);
-  box-shadow: 0 22px 40px -24px rgba(23, 22, 28, .35);
+.fx-tab:first-child { border-left: 0; padding-left: 0; }
+.fx-tab .ix {
+  font-family: var(--mono);
+  font-size: 10px;
+  font-weight: 500;
+  letter-spacing: .16em;
+  color: rgba(242, 241, 245, .3);
+  transition: color .22s var(--ease), opacity .3s var(--ease);
 }
-.tile-ic {
-  width: 34px; height: 34px;
-  border-radius: 10px;
-  background: var(--accent-wash);
-  color: var(--accent);
-  display: grid;
-  place-items: center;
-  margin-bottom: 16px;
-}
-.tile-ic svg { width: 17px; height: 17px; }
-.tile h3 {
-  font-size: 1.0625rem;
-  font-weight: 700;
+.fx-tab .nm {
+  font-size: 14px;
+  font-weight: 600;
   letter-spacing: -.025em;
-  margin-bottom: 7px;
-}
-.tile p {
-  font-size: .875rem;
-  line-height: 1.68;
-  color: var(--muted);
+  line-height: 1.32;
   word-break: keep-all;
 }
-.tile .visual { margin-top: 18px; }
-
-.t-auto   { grid-column: span 2; grid-row: span 2; }
-.t-repeat { grid-column: span 2; }
-.t-calc   { grid-column: span 1; }
-.t-sync   { grid-column: span 1; }
-.t-view   { grid-column: span 2; }
-.t-privacy{ grid-column: span 2; }
-.t-auto h3 { font-size: 1.3rem; }
-.t-auto p { font-size: .9375rem; max-width: 40ch; }
-.t-auto .visual { margin-top: auto; padding-top: 22px; }
-
-/* 타일 내부 미니 목업 */
-.mini {
-  background: var(--canvas);
-  border: 1px solid var(--line);
-  border-radius: 12px;
-  padding: 10px 12px;
-  display: flex;
-  align-items: center;
-  gap: 9px;
+.fx-tab:hover { color: rgba(242, 241, 245, .78); }
+.fx-tab[aria-selected="true"] { color: #FFFFFF; }
+.fx-tab[aria-selected="true"] .ix { color: var(--accent); opacity: 1; }
+.fx-tab.is-seen .ix { opacity: .55; }
+.fx-tab.is-pressed { transform: scale(.975); }
+.fx-tab:focus-visible { outline: 2px solid var(--accent); outline-offset: -4px; }
+.fx-ind {
+  position: absolute;
+  left: 0; bottom: -1px;
+  width: 100px; height: 2px;
+  background: var(--accent);
+  transform-origin: 0 50%;
+  transform: translate3d(0, 0, 0) scaleX(0);
+  will-change: transform;
+  pointer-events: none;
 }
-.mini + .mini { margin-top: 7px; }
-.mini .lbl { flex: 1; min-width: 0; font-size: 11.5px; font-weight: 600; }
-.mini .lbl i {
-  display: block;
-  font-style: normal;
-  font-family: var(--mono);
-  font-size: 9px;
+
+/* ── 무대: 좌 설명 / 우 영수증 ── */
+.fx-stage {
+  display: grid;
+  grid-template-columns: minmax(0, .84fr) minmax(0, 1.16fr);
+  gap: clamp(32px, 5vw, 76px);
+  align-items: center;
+}
+.fx-copy { display: grid; align-items: start; }
+.fx-txt {
+  grid-area: 1 / 1;
+  opacity: 0;
+  visibility: hidden;
+}
+.fx-txt.is-in { opacity: 1; visibility: visible; }
+.fx-txt h3 {
+  font-size: clamp(1.6rem, 3vw, 2.15rem);
+  font-weight: 700;
+  letter-spacing: -.035em;
+  line-height: 1.24;
+  margin-bottom: 14px;
+  word-break: keep-all;
+  color: #FFFFFF;
+}
+.fx-txt p {
+  font-size: 15px;
   font-weight: 400;
-  color: var(--muted);
-  margin-top: 1px;
+  line-height: 1.78;
+  letter-spacing: -.012em;
+  color: rgba(242, 241, 245, .56);
+  max-width: 32ch;
+  word-break: keep-all;
 }
-.mini .val { font-family: var(--mono); font-size: 11.5px; font-weight: 700; white-space: nowrap; }
-.mini.dashed { border-style: dashed; background: transparent; }
-.flow {
+.fx-txt .meta {
+  display: inline-block;
+  margin-top: 18px;
+  font-family: var(--mono);
+  font-size: 11px;
+  letter-spacing: .1em;
+  color: rgba(242, 241, 245, .38);
+  border-top: 1px solid rgba(242, 241, 245, .16);
+  padding-top: 10px;
+}
+.fx-txt h3, .fx-txt p, .fx-txt .meta {
+  opacity: 0;
+  transform: translate3d(0, 7px, 0);
+}
+.fx-txt.is-in h3, .fx-txt.is-in p, .fx-txt.is-in .meta {
+  opacity: 1;
+  transform: none;
+  transition: opacity 240ms var(--ease), transform 240ms var(--ease);
+}
+.fx-txt.is-in h3 { transition-delay: 110ms; }
+.fx-txt.is-in p { transition-delay: 170ms; }
+.fx-txt.is-in .meta { transition-delay: 215ms; }
+.fx-txt.is-out h3, .fx-txt.is-out p, .fx-txt.is-out .meta {
+  opacity: 0;
+  transform: translate3d(0, -5px, 0);
+  transition: opacity 120ms var(--ease-in), transform 120ms var(--ease-in);
+}
+
+/* ── 영수증 ── */
+.fx-papers {
+  display: grid;
+  justify-items: center;
+  isolation: isolate;
+}
+.paper {
+  grid-area: 1 / 1;
+  width: min(400px, 100%);
+  background: #FAF9FB;
+  color: var(--ink);
+  padding: 22px 22px 26px;
+  border-radius: 3px;
+  filter: drop-shadow(0 30px 46px rgba(0, 0, 0, .5));
+  opacity: 0;
+  visibility: hidden;
+  transform: rotate(-0.7deg) translate3d(calc(var(--dir, 1) * 24px), 0, 0);
+}
+.paper.is-in {
+  opacity: 1;
+  visibility: visible;
+  transform: rotate(-0.7deg) translate3d(0, 0, 0);
+  transition:
+    opacity var(--d-in) var(--ease) var(--overlap),
+    transform var(--d-in) var(--ease) var(--overlap),
+    visibility 0s linear var(--overlap);
+}
+.paper.is-out {
+  opacity: 0;
+  visibility: visible;
+  transform: rotate(-0.7deg) translate3d(calc(var(--dir, 1) * -16px), 0, 0);
+  transition:
+    opacity var(--d-out) var(--ease-in),
+    transform var(--d-out) var(--ease-in),
+    visibility 0s linear var(--d-out);
+}
+.p-head {
   display: flex;
-  align-items: center;
-  gap: 8px;
-  margin: 9px 0;
-  color: var(--accent);
+  justify-content: space-between;
+  align-items: baseline;
   font-family: var(--mono);
   font-size: 9.5px;
-  letter-spacing: .1em;
-  text-transform: uppercase;
+  letter-spacing: .2em;
+  color: rgba(23, 22, 28, .42);
+  padding-bottom: 11px;
+  border-bottom: 1px dashed rgba(23, 22, 28, .3);
+  margin-bottom: 14px;
 }
-.flow::after { content: ""; flex: 1; height: 1px; background: var(--line); }
-.flow svg { width: 13px; height: 13px; }
-
-.chips { display: flex; flex-wrap: wrap; gap: 5px; margin-top: 14px; }
-.chips span {
+.perf {
+  border: 0;
+  border-top: 1px dashed rgba(23, 22, 28, .26);
+  margin: 14px -22px;
+}
+.p-label {
   font-family: var(--mono);
-  font-size: 10px;
-  color: var(--muted);
-  border: 1px solid var(--line);
-  border-radius: 6px;
-  padding: 4px 8px;
+  font-size: 9.5px;
+  letter-spacing: .16em;
+  color: rgba(23, 22, 28, .4);
+  margin-bottom: 8px;
 }
-
-.calc-line {
-  display: flex;
-  align-items: baseline;
-  justify-content: space-between;
-  gap: 8px;
+.p-big {
   font-family: var(--mono);
+  font-size: clamp(2.1rem, 4.6vw, 2.85rem);
+  font-weight: 700;
+  letter-spacing: -.035em;
+  line-height: 1;
+  font-variant-numeric: tabular-nums;
 }
-.calc-line .ex { font-size: 12.5px; color: var(--muted); }
-.calc-line .rs { font-size: 14px; font-weight: 700; color: var(--ink); }
-
-.cal-strip { display: grid; grid-template-columns: repeat(7, 1fr); gap: 5px; }
-.cal-strip div {
-  background: var(--canvas);
-  border: 1px solid var(--line);
-  border-radius: 8px;
-  padding: 7px 4px 6px;
-  text-align: center;
-  font-family: var(--mono);
-  font-size: 10px;
-  color: var(--muted);
+.p-big .won {
+  font-family: var(--sans);
+  font-size: .32em;
+  font-weight: 600;
+  letter-spacing: -.02em;
+  margin-left: .12em;
+  vertical-align: .14em;
 }
-.cal-strip div b { display: block; font-size: 11px; color: var(--ink); font-weight: 700; }
-.cal-strip div em { display: block; font-style: normal; font-size: 8.5px; margin-top: 3px; }
-.cal-strip em.m { color: var(--minus); }
-.cal-strip em.p { color: var(--plus); }
-.cal-strip div.on { border-color: rgba(91, 75, 214, .35); background: var(--accent-wash); }
-
-.sync-line {
+.p-big.m { color: var(--minus); }
+.p-big.p { color: var(--plus); }
+.p-line {
   display: flex;
   align-items: center;
   gap: 9px;
-  color: var(--muted);
+  padding: 9px 0;
 }
-.sync-line .dots { flex: 1; height: 1px; background: repeating-linear-gradient(90deg, var(--line) 0 4px, transparent 4px 8px); }
-.sync-line svg { width: 16px; height: 16px; }
-.sync-line .cloud { color: var(--accent); }
-
-.perm { display: grid; grid-template-columns: repeat(2, minmax(0, 1fr)); gap: 7px; }
-.switch {
+.p-line + .p-line { border-top: 1px solid rgba(23, 22, 28, .08); }
+.p-line .t {
+  flex: 1;
+  min-width: 0;
+  font-size: 12.5px;
+  font-weight: 600;
+  letter-spacing: -.015em;
+}
+.p-line .t i {
+  display: block;
+  font-style: normal;
+  font-size: 10px;
+  font-weight: 400;
+  color: rgba(23, 22, 28, .45);
+  margin-top: 2px;
+}
+.p-line .v {
+  font-family: var(--mono);
+  font-size: 12.5px;
+  font-weight: 700;
+  font-variant-numeric: tabular-nums;
+  white-space: nowrap;
+}
+.p-line .v.m { color: var(--minus); }
+.p-line .v.p { color: var(--plus); }
+.p-foot {
+  font-family: var(--mono);
+  font-size: 10px;
+  letter-spacing: .12em;
+  color: rgba(23, 22, 28, .4);
+  text-align: right;
+  margin-top: 12px;
+}
+.p-sms {
+  background: rgba(23, 22, 28, .045);
+  border-radius: 2px 10px 10px 10px;
+  padding: 10px 12px;
+  font-size: 11px;
+  line-height: 1.55;
+  color: rgba(23, 22, 28, .72);
+}
+.p-sms b { font-weight: 700; color: var(--ink); }
+.p-chips { display: flex; flex-wrap: wrap; gap: 4px; margin-top: 12px; }
+.p-chips span {
+  font-family: var(--mono);
+  font-size: 9.5px;
+  color: rgba(23, 22, 28, .5);
+  border: 1px solid rgba(23, 22, 28, .16);
+  border-radius: 3px;
+  padding: 3px 7px;
+}
+.p-badge {
+  font-family: var(--mono);
+  font-size: 8.5px;
+  font-weight: 500;
+  letter-spacing: .08em;
+  color: var(--accent);
+  border: 1px solid rgba(91, 75, 214, .38);
+  border-radius: 999px;
+  padding: 2px 7px;
+  flex-shrink: 0;
+}
+.p-seg {
+  display: flex;
+  position: relative;
+  background: rgba(23, 22, 28, .06);
+  border-radius: 4px;
+  padding: 3px;
+  margin-bottom: 14px;
+}
+.p-seg span {
+  flex: 1;
+  text-align: center;
+  font-size: 11px;
+  font-weight: 700;
+  padding: 5px 0;
+  position: relative;
+  z-index: 1;
+  color: rgba(23, 22, 28, .45);
+}
+.p-seg span:last-child { color: var(--ink); }
+.p-seg .knob {
+  position: absolute;
+  top: 3px; left: 3px; bottom: 3px;
+  width: calc(50% - 3px);
+  background: #FAF9FB;
+  border-radius: 3px;
+  box-shadow: 0 1px 3px rgba(23, 22, 28, .14);
+  transform: translate3d(100%, 0, 0);
+}
+.p-cal { display: grid; grid-template-columns: repeat(7, 1fr); gap: 3px; }
+.p-cal .dw {
+  font-family: var(--mono);
+  font-size: 8px;
+  text-align: center;
+  color: rgba(23, 22, 28, .35);
+  padding-bottom: 3px;
+}
+.p-cal .cell {
+  min-height: 30px;
+  border-radius: 3px;
+  text-align: center;
+  padding-top: 3px;
+  font-family: var(--mono);
+  font-size: 9.5px;
+  color: rgba(23, 22, 28, .62);
+}
+.p-cal .cell em {
+  display: block;
+  font-style: normal;
+  font-size: 7.5px;
+  font-weight: 700;
+  margin-top: 2px;
+}
+.p-cal .cell em.m { color: var(--minus); }
+.p-cal .cell em.p { color: var(--plus); }
+.p-cal .cell.on { background: rgba(91, 75, 214, .1); color: var(--ink); font-weight: 700; }
+.p-redact {
+  position: relative;
+  display: inline-block;
+  font-size: 11px;
+  line-height: 1.9;
+}
+.p-redact .bar {
+  position: absolute;
+  left: -2px; top: 12%;
+  height: 76%;
+  width: 100%;
+  background: #17161C;
+  transform-origin: 0 50%;
+  transform: scaleX(1);
+}
+.p-toggle {
+  display: flex;
+  align-items: center;
+  gap: 9px;
+  padding: 8px 0;
+  font-size: 11.5px;
+  font-weight: 600;
+}
+.p-toggle span:first-child { flex: 1; }
+.p-sw {
   width: 30px; height: 18px;
   border-radius: 999px;
-  background: rgba(23, 22, 28, .14);
+  background: var(--accent);
   position: relative;
   flex-shrink: 0;
 }
-.switch::after {
-  content: "";
+.p-sw i {
   position: absolute;
   top: 2px; left: 2px;
   width: 14px; height: 14px;
   border-radius: 50%;
   background: #fff;
+  transform: translate3d(12px, 0, 0);
 }
-.switch.on { background: var(--accent); }
-.switch.on::after { left: auto; right: 2px; }
+.p-sw.off { background: rgba(23, 22, 28, .18); }
+.p-sw.off i { transform: none; }
+.p-sync { display: flex; align-items: center; justify-content: center; gap: 12px; padding: 4px 0 2px; }
+.p-sync .dev {
+  width: 44px; height: 62px;
+  border: 1.5px solid rgba(23, 22, 28, .3);
+  border-radius: 6px;
+  display: grid;
+  gap: 3px;
+  align-content: start;
+  padding: 7px 5px;
+}
+.p-sync .dev b { height: 4px; border-radius: 1px; background: rgba(23, 22, 28, .16); display: block; }
+.p-sync .dev b.hi { background: var(--minus); }
+.p-sync .arc { flex: 1; height: 1px; background: repeating-linear-gradient(90deg, rgba(23,22,28,.3) 0 3px, transparent 3px 7px); }
+.p-sync .cl { color: rgba(23, 22, 28, .55); }
+.p-sync .cl svg { width: 22px; height: 22px; }
+.p-expr {
+  font-family: var(--mono);
+  font-size: 19px;
+  font-weight: 500;
+  letter-spacing: -.01em;
+  color: rgba(23, 22, 28, .55);
+  position: relative;
+  display: inline-block;
+}
+.p-expr .mask {
+  position: absolute;
+  inset: -2px -3px;
+  background: #FAF9FB;
+  transform-origin: 100% 50%;
+}
+
+/* ── 시퀀스 (선택 시 1회 재생) ── */
+.paper [class*="sq-"] { animation-duration: var(--seq, 2400ms); animation-fill-mode: both; animation-iteration-count: 1; animation-play-state: paused; }
+.paper.is-playing [class*="sq-"] { animation-play-state: running; }
+
+.sq-sms { animation-name: sqSms; animation-timing-function: var(--ease); }
+@keyframes sqSms {
+  0%       { opacity: 0; transform: translate3d(0, -14px, 0); }
+  14%, 100%{ opacity: 1; transform: none; }
+}
+.sq-scan { animation-name: sqScan; animation-timing-function: linear; }
+@keyframes sqScan {
+  0%, 20%  { opacity: 0; transform: translate3d(0, -100%, 0); }
+  24%      { opacity: 1; }
+  36%      { opacity: 1; }
+  40%, 100%{ opacity: 0; transform: translate3d(0, 220%, 0); }
+}
+.sq-vp { overflow: hidden; }
+.sq-grow { animation-name: sqGrow; animation-timing-function: var(--ease); }
+@keyframes sqGrow {
+  0%, 42%  { transform: translate3d(0, -74px, 0); }
+  60%, 100%{ transform: none; }
+}
+.sq-fade { animation-name: sqFade; animation-timing-function: var(--ease); }
+@keyframes sqFade {
+  0%, 44%  { opacity: 0; }
+  58%, 100%{ opacity: 1; }
+}
+.sq-badge { animation-name: sqBadge; animation-timing-function: var(--ease-pop); }
+@keyframes sqBadge {
+  0%, 60%  { opacity: 0; transform: scale(.55); }
+  70%, 100%{ opacity: 1; transform: scale(1); }
+}
+.sq-stack { animation-name: sqStack; animation-timing-function: var(--ease); animation-duration: calc(var(--seq, 2400ms) * .16); animation-delay: var(--sd, 0ms); }
+@keyframes sqStack {
+  0%   { opacity: 0; transform: translate3d(0, -9px, 0); }
+  100% { opacity: var(--fo, 1); transform: none; }
+}
+.sq-type { animation-name: sqType; animation-timing-function: steps(7, end); }
+@keyframes sqType {
+  0%, 12% { transform: scaleX(1); }
+  46%     { transform: scaleX(0); }
+  100%    { transform: scaleX(0); }
+}
+.sq-res { animation-name: sqRes; animation-timing-function: var(--ease-pop); }
+@keyframes sqRes {
+  0%, 50%  { opacity: 0; transform: translate3d(0, 10px, 0) scale(.94); }
+  64%, 100%{ opacity: 1; transform: none; }
+}
+.sq-knob { animation-name: sqKnob; animation-timing-function: var(--ease); }
+@keyframes sqKnob {
+  0%, 16%  { transform: translate3d(0, 0, 0) scaleX(1); }
+  26%      { transform: translate3d(52%, 0, 0) scaleX(1.12); }
+  34%, 100%{ transform: translate3d(100%, 0, 0) scaleX(1); }
+}
+.sq-cal { animation-name: sqCal; animation-timing-function: var(--ease); animation-duration: calc(var(--seq, 2400ms) * .2); animation-delay: var(--sd, 0ms); }
+@keyframes sqCal {
+  0%   { opacity: 0; transform: translate3d(0, 9px, 0); }
+  100% { opacity: 1; transform: none; }
+}
+.sq-tok { animation-name: sqTok; animation-timing-function: linear; }
+@keyframes sqTok {
+  0%, 10%  { opacity: 0; transform: translate3d(0, 0, 0) scale(.4); }
+  16%      { opacity: 1; transform: translate3d(24px, -22px, 0) scale(1); }
+  26%      { opacity: 1; transform: translate3d(52px, -30px, 0) scale(1); }
+  38%      { opacity: 1; transform: translate3d(84px, -22px, 0) scale(1); }
+  46%      { opacity: 0; transform: translate3d(104px, -4px, 0) scale(.4); }
+  100%     { opacity: 0; transform: translate3d(104px, -4px, 0) scale(.4); }
+}
+.sq-recv { animation-name: sqRecv; animation-timing-function: var(--ease); }
+@keyframes sqRecv {
+  0%, 48%  { opacity: 0; transform: translate3d(0, -6px, 0); }
+  62%, 100%{ opacity: 1; transform: none; }
+}
+.sq-redact { animation-name: sqRedact; animation-timing-function: cubic-bezier(.2, .9, .1, 1); animation-delay: var(--sd, 0ms); animation-duration: calc(var(--seq, 2400ms) * .12); }
+@keyframes sqRedact {
+  0%   { transform: scaleX(0); }
+  100% { transform: scaleX(1); }
+}
+.sq-lock { animation-name: sqLock; animation-timing-function: var(--ease); }
+@keyframes sqLock {
+  0%, 66%  { opacity: 0; transform: translate3d(0, 7px, 0); }
+  82%, 100%{ opacity: 1; transform: none; }
+}
 
 /* ═════════ 시작 가이드 ═════════ */
 .guide { background: var(--surface); border-top: 1px solid var(--line); }
@@ -609,6 +947,36 @@ footer {
 .foot .tech { font-family: var(--mono); font-size: 11px; letter-spacing: .08em; color: rgba(255, 255, 255, .34); }
 
 /* ═════════ 반응형 ═════════ */
+@media (max-width: 900px) {
+  .fx-stage { grid-template-columns: 1fr; gap: 34px; }
+  .fx-copy { order: -1; }
+  .fx-txt p { max-width: 46ch; }
+}
+@media (max-width: 860px) {
+  .fx-nav {
+    display: grid;
+    grid-template-columns: repeat(3, minmax(0, 1fr));
+    gap: 1px;
+    background: rgba(242, 241, 245, .1);
+    border: 1px solid rgba(242, 241, 245, .1);
+    border-radius: 4px;
+    overflow: hidden;
+  }
+  .fx-tab {
+    border-left: 0;
+    background: var(--shell);
+    min-height: 58px;
+    padding: 10px 12px 12px;
+  }
+  .fx-tab:first-child { padding-left: 12px; }
+  .fx-tab[aria-selected="true"] { background: #221E33; }
+  .fx-ind { display: none; }
+}
+@media (max-width: 560px) {
+  .fx-nav { grid-template-columns: repeat(2, minmax(0, 1fr)); }
+  .paper { padding: 18px 16px 22px; }
+  .perf { margin-left: -16px; margin-right: -16px; }
+}
 @media (max-width: 980px) {
   .hero { padding-top: 132px; }
   .hero-grid { grid-template-columns: 1fr; gap: 48px; }
@@ -644,6 +1012,11 @@ footer {
   .js .reveal { opacity: 1; transform: none; }
   .notif { animation: none; }
   .row.landed { animation: none; max-height: none; }
+  /* 시퀀스는 최종 상태로 고정 */
+  .paper [class*="sq-"] { animation: none !important; }
+  .paper { transform: rotate(-0.7deg) !important; }
+  .p-seg .knob { transform: translate3d(100%, 0, 0); }
+  .p-redact .bar { transform: scaleX(1); }
 }
 </style>
 </head>
@@ -754,129 +1127,213 @@ footer {
 </section>
 
 <!-- ═════════ 주요 기능 ═════════ -->
-<section id="features">
+<section class="feat" id="features">
   <div class="wrap">
     <div class="sec-head reveal">
       <div>
         <span class="eyebrow">주요 기능</span>
-        <h2>기록하는 가계부에서<br>기록되는 가계부로</h2>
+        <h2>여섯 가지를<br>눌러서 확인하세요</h2>
       </div>
-      <p>여섯 가지 기능이 하나의 흐름으로 이어집니다. 감지해서 적고, 반복을 미리 깔고, 흐름을 확인합니다.</p>
+      <p>기능을 고르면 그 기능이 실제로 무엇을 하는지 영수증 위에 다시 인쇄됩니다.</p>
     </div>
 
-    <div class="bento">
-      <article class="tile t-auto reveal" style="--d:0ms">
-        <div class="tile-ic" aria-hidden="true">
-          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="M21 15a2 2 0 0 1-2 2H7l-4 4V5a2 2 0 0 1 2-2h14a2 2 0 0 1 2 2z"/><path d="M13 7l-3 4h4l-3 4"/></svg>
-        </div>
-        <h3>카드·은행 자동입력</h3>
-        <p>카드 승인 문자와 연관 은행의 입출금 알림을 감지해 가계부에 바로 올립니다. SMS 권한이 제한된 기기에서는 메시지 앱 알림으로 읽습니다.</p>
-        <div class="visual">
-          <div class="mini dashed">
-            <span class="lbl">[Web발신] 신한카드 승인<i>4,500원 일시불 스타벅스</i></span>
-          </div>
-          <div class="flow">
-            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M12 5v14M6 13l6 6 6-6"/></svg>
-            기기 내 분석
-          </div>
-          <div class="mini">
-            <span class="tag out">지출</span>
-            <span class="lbl">커피<i>신한카드 · 문자 감지</i></span>
-            <span class="val" style="color:var(--minus)">-4,500원</span>
-          </div>
-          <div class="chips">
-            <span>신한</span><span>KB국민</span><span>현대</span><span>삼성</span><span>롯데</span>
-            <span>하나</span><span>우리</span><span>NH농협</span><span>BC</span>
-          </div>
-        </div>
-      </article>
+    <div class="fx-nav reveal" role="tablist" aria-label="주요 기능">
+      <button class="fx-tab" role="tab" id="t0" aria-controls="p0" aria-selected="true" tabindex="0">
+        <span class="ix">01</span><span class="nm">카드 자동입력</span>
+      </button>
+      <button class="fx-tab" role="tab" id="t1" aria-controls="p1" aria-selected="false" tabindex="-1">
+        <span class="ix">02</span><span class="nm">반복 등록</span>
+      </button>
+      <button class="fx-tab" role="tab" id="t2" aria-controls="p2" aria-selected="false" tabindex="-1">
+        <span class="ix">03</span><span class="nm">금액 계산</span>
+      </button>
+      <button class="fx-tab" role="tab" id="t3" aria-controls="p3" aria-selected="false" tabindex="-1">
+        <span class="ix">04</span><span class="nm">캘린더 보기</span>
+      </button>
+      <button class="fx-tab" role="tab" id="t4" aria-controls="p4" aria-selected="false" tabindex="-1">
+        <span class="ix">05</span><span class="nm">기기 동기화</span>
+      </button>
+      <button class="fx-tab" role="tab" id="t5" aria-controls="p5" aria-selected="false" tabindex="-1">
+        <span class="ix">06</span><span class="nm">원문 미저장</span>
+      </button>
+      <span class="fx-ind" aria-hidden="true"></span>
+    </div>
 
-      <article class="tile t-repeat reveal" style="--d:70ms">
-        <div class="tile-ic" aria-hidden="true">
-          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="M17 2l4 4-4 4"/><path d="M3 11V9a4 4 0 0 1 4-4h14"/><path d="M7 22l-4-4 4-4"/><path d="M21 13v2a4 4 0 0 1-4 4H3"/></svg>
+    <div class="fx-stage reveal" style="--d:80ms">
+      <!-- 설명 -->
+      <div class="fx-copy">
+        <div class="fx-txt is-in" role="tabpanel" id="p0" aria-labelledby="t0" tabindex="0">
+          <h3>결제하면<br>가계부가 먼저 적습니다</h3>
+          <p>카드 승인 문자와 은행 입출금 알림이 도착하면 금액과 사용처, 일시를 읽어 그 자리에서 내역을 만듭니다. 앱을 열 필요도, 영수증을 모을 필요도 없습니다.</p>
+          <span class="meta">신한 · KB국민 · 현대 · 삼성 · 롯데 · 하나 · 우리 · NH농협 · BC</span>
         </div>
-        <h3>반복 수입·지출</h3>
-        <p>월세·구독료·월급처럼 되풀이되는 항목은 주기와 적용 기간만 정하면, 저장하는 즉시 그 기간의 내역이 한 번에 깔립니다.</p>
-        <div class="visual">
-          <div class="mini">
-            <span class="lbl">월세, 공과금<i>매월 21일 · 2026.08 ~ 2028.03</i></span>
-            <span class="val" style="color:var(--minus)">-605,000원</span>
-          </div>
-          <div class="chips">
-            <span>매일</span><span>매주</span><span>매월</span><span>시작일·마감일 포함</span>
-          </div>
+        <div class="fx-txt" role="tabpanel" id="p1" aria-labelledby="t1" tabindex="0" hidden>
+          <h3>한 번 정하면<br>1년 치가 깔립니다</h3>
+          <p>월세와 구독료는 매달 똑같이 나갑니다. 주기와 기간만 지정하면 저장하는 순간 그 기간의 내역이 한꺼번에 생성됩니다.</p>
+          <span class="meta">매일 · 매주 · 매월 · 시작일과 마감일 포함</span>
         </div>
-      </article>
+        <div class="fx-txt" role="tabpanel" id="p2" aria-labelledby="t2" tabindex="0" hidden>
+          <h3>더치페이,<br>암산하지 마세요</h3>
+          <p>금액 칸이 곧 계산기입니다.</p>
+          <span class="meta">계산 결과를 그대로 금액에 적용</span>
+        </div>
+        <div class="fx-txt" role="tabpanel" id="p3" aria-labelledby="t3" tabindex="0" hidden>
+          <h3>한 달을<br>한 장으로 봅니다</h3>
+          <p>리스트로 훑고 캘린더로 짚습니다. 어느 날 얼마를 썼는지 달력 위에서 바로 읽히고, 날짜를 누르면 그날의 내역으로 들어갑니다.</p>
+          <span class="meta">월별 합계 · 리스트 · 캘린더</span>
+        </div>
+        <div class="fx-txt" role="tabpanel" id="p4" aria-labelledby="t4" tabindex="0" hidden>
+          <h3>기기를 바꿔도<br>기록은 그대로</h3>
+          <p>Google 계정으로 로그인하면 적은 내역이 곧바로 백업됩니다. 새 폰에서 로그인하는 것으로 복원은 끝납니다.</p>
+          <span class="meta">Google 로그인 · Firebase 백업</span>
+        </div>
+        <div class="fx-txt" role="tabpanel" id="p5" aria-labelledby="t5" tabindex="0" hidden>
+          <h3>문자 원문은<br>남기지 않습니다</h3>
+          <p>분석은 기기 안에서 끝나고, 금액과 사용처와 일시만 남습니다. 원문은 저장하지도 서버로 보내지도 않으며, 감지할 카드사도 직접 고릅니다.</p>
+          <span class="meta">온디바이스 분석 · 카드사별 on/off</span>
+        </div>
+      </div>
 
-      <article class="tile t-calc reveal" style="--d:140ms">
-        <div class="tile-ic" aria-hidden="true">
-          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><rect x="4" y="2" width="16" height="20" rx="2.5"/><path d="M8 6h8M8 11h.01M12 11h.01M16 11h.01M8 15h.01M12 15h.01M16 15v4M8 19h4"/></svg>
+      <!-- 영수증 -->
+      <div class="fx-papers" aria-hidden="true">
+
+        <!-- 01 자동입력 -->
+        <div class="paper is-in" data-seq="2600">
+          <div class="p-head"><span>SHINHAN CARD</span><span>08/05 17:38</span></div>
+          <div class="p-sms sq-sms"><b>[Web발신] 신한카드 승인</b><br>4,500원 일시불 · 스타벅스 강남</div>
+          <div style="position:relative;overflow:hidden;margin:12px -22px 0;padding:0 22px">
+            <div class="sq-scan" style="position:absolute;inset:0;background:linear-gradient(180deg,transparent,rgba(91,75,214,.18) 45%,rgba(91,75,214,.36),transparent)"></div>
+            <div class="p-label">기기 내 분석</div>
+          </div>
+          <hr class="perf">
+          <div class="p-label">지출</div>
+          <div class="p-big m sq-fade">-4,500<span class="won">원</span></div>
+          <div class="sq-vp" style="margin-top:12px">
+            <div class="sq-grow">
+              <div class="p-line">
+                <span class="t">커피<i>신한카드 · 문자 감지</i></span>
+                <span class="p-badge sq-badge">AUTO</span>
+                <span class="v m">-4,500원</span>
+              </div>
+              <div class="p-line">
+                <span class="t">고현서<i>신한은행 · 문자 감지</i></span>
+                <span class="v m">-100원</span>
+              </div>
+            </div>
+          </div>
+          <div class="p-chips">
+            <span>신한</span><span>KB국민</span><span>현대</span><span>삼성</span><span>롯데</span><span>하나</span><span>우리</span><span>NH농협</span><span>BC</span>
+          </div>
         </div>
-        <h3>입력란 속 계산기</h3>
-        <p>더치페이도 앱을 벗어나지 않고 금액 칸에서 바로 계산해 적용합니다.</p>
-        <div class="visual">
-          <div class="mini">
-            <span class="calc-line" style="flex:1">
-              <span class="ex">3,900 × 5</span>
-              <span class="rs">19,500</span>
+
+        <!-- 02 반복 -->
+        <div class="paper" data-seq="2400">
+          <div class="p-head"><span>RECURRING</span><span>매월 21일</span></div>
+          <div class="p-line" style="padding-top:0">
+            <span class="t">월세, 공과금<i>2026.08.20 ~ 2028.03.25</i></span>
+            <span class="v m">-605,000원</span>
+          </div>
+          <hr class="perf">
+          <div class="p-label">저장 즉시 생성됨</div>
+          <div class="p-line sq-stack" style="--sd:340ms"><span class="t">2026-08-21</span><span class="v m">-605,000원</span></div>
+          <div class="p-line sq-stack" style="--sd:400ms"><span class="t">2026-09-21</span><span class="v m">-605,000원</span></div>
+          <div class="p-line sq-stack" style="--sd:470ms"><span class="t">2026-10-21</span><span class="v m">-605,000원</span></div>
+          <div class="p-line sq-stack" style="--sd:600ms"><span class="t">2026-11-21</span><span class="v m">-605,000원</span></div>
+          <div class="p-line sq-stack" style="--sd:790ms;--fo:.45"><span class="t">2026-12-21</span><span class="v m">-605,000원</span></div>
+          <div class="p-foot">20건 생성</div>
+        </div>
+
+        <!-- 03 계산기 -->
+        <div class="paper" data-seq="2000">
+          <div class="p-head"><span>CALCULATOR</span><span>금액 입력</span></div>
+          <div class="p-label">수식</div>
+          <div class="p-expr">3,900 × 5<span class="mask sq-type"></span></div>
+          <hr class="perf">
+          <div class="sq-res">
+            <div class="p-label">적용될 금액</div>
+            <div class="p-big m">-19,500<span class="won">원</span></div>
+          </div>
+          <div class="p-foot">금액에 적용</div>
+        </div>
+
+        <!-- 04 캘린더 -->
+        <div class="paper" data-seq="2200">
+          <div class="p-head"><span>2026.08</span><span>-697,942원</span></div>
+          <div class="p-seg"><span class="knob sq-knob"></span><span>리스트</span><span>캘린더</span></div>
+          <div class="p-cal">
+            <div class="dw">일</div><div class="dw">월</div><div class="dw">화</div><div class="dw">수</div><div class="dw">목</div><div class="dw">금</div><div class="dw">토</div>
+            <div class="cell sq-cal" style="--sd:300ms">2</div>
+            <div class="cell sq-cal" style="--sd:300ms">3<em class="m">-73,442</em></div>
+            <div class="cell sq-cal" style="--sd:300ms">4<em class="m">-19,500</em></div>
+            <div class="cell on sq-cal" style="--sd:300ms">5</div>
+            <div class="cell sq-cal" style="--sd:300ms">6</div>
+            <div class="cell sq-cal" style="--sd:300ms">7</div>
+            <div class="cell sq-cal" style="--sd:300ms">8</div>
+            <div class="cell sq-cal" style="--sd:420ms">16</div>
+            <div class="cell sq-cal" style="--sd:420ms">17</div>
+            <div class="cell sq-cal" style="--sd:420ms">18</div>
+            <div class="cell sq-cal" style="--sd:420ms">19</div>
+            <div class="cell sq-cal" style="--sd:420ms">20</div>
+            <div class="cell sq-cal" style="--sd:420ms">21<em class="m">-605,000</em></div>
+            <div class="cell sq-cal" style="--sd:420ms">22</div>
+            <div class="cell sq-cal" style="--sd:540ms">23</div>
+            <div class="cell sq-cal" style="--sd:540ms">24</div>
+            <div class="cell sq-cal" style="--sd:540ms">25<em class="p">+4,007,324</em></div>
+            <div class="cell sq-cal" style="--sd:540ms">26</div>
+            <div class="cell sq-cal" style="--sd:540ms">27</div>
+            <div class="cell sq-cal" style="--sd:540ms">28</div>
+            <div class="cell sq-cal" style="--sd:540ms">29<em class="m">-11,900</em></div>
+          </div>
+        </div>
+
+        <!-- 05 동기화 -->
+        <div class="paper" data-seq="2400">
+          <div class="p-head"><span>SYNC</span><span>17:38 완료</span></div>
+          <div class="p-sync" style="position:relative">
+            <div class="dev"><b class="hi"></b><b></b><b></b></div>
+            <span class="arc"></span>
+            <span class="cl">
+              <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round"><path d="M17.5 19a4.5 4.5 0 0 0 0-9 6 6 0 0 0-11.6 1.5A3.5 3.5 0 0 0 6.5 19z"/></svg>
             </span>
+            <span class="arc"></span>
+            <div class="dev"><b class="hi sq-recv"></b><b></b><b></b></div>
+            <span class="sq-tok" style="position:absolute;left:44px;bottom:26px;width:6px;height:6px;border-radius:50%;background:var(--accent)"></span>
           </div>
+          <hr class="perf">
+          <div class="p-line" style="padding-bottom:0">
+            <span class="t">커피<i>이 기기에서 기록</i></span>
+            <span class="v m">-4,500원</span>
+          </div>
+          <div class="p-line sq-recv">
+            <span class="t">커피<i>다른 기기에 도착</i></span>
+            <span class="v m">-4,500원</span>
+          </div>
+          <div class="p-foot">Google 계정 백업</div>
         </div>
-      </article>
 
-      <article class="tile t-sync reveal" style="--d:210ms">
-        <div class="tile-ic" aria-hidden="true">
-          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="M17.5 19a4.5 4.5 0 0 0 0-9 6 6 0 0 0-11.6 1.5A3.5 3.5 0 0 0 6.5 19z"/></svg>
-        </div>
-        <h3>클라우드 동기화</h3>
-        <p>Google 계정으로 로그인하면 기록이 안전하게 백업되어 기기를 바꿔도 이어집니다.</p>
-        <div class="visual">
-          <div class="sync-line" aria-hidden="true">
-            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linejoin="round"><rect x="6" y="2" width="12" height="20" rx="2.5"/><path d="M11 18h2" stroke-linecap="round"/></svg>
-            <span class="dots"></span>
-            <svg class="cloud" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round"><path d="M17.5 19a4.5 4.5 0 0 0 0-9 6 6 0 0 0-11.6 1.5A3.5 3.5 0 0 0 6.5 19z"/></svg>
-            <span class="dots"></span>
-            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linejoin="round"><rect x="6" y="2" width="12" height="20" rx="2.5"/><path d="M11 18h2" stroke-linecap="round"/></svg>
+        <!-- 06 개인정보 -->
+        <div class="paper" data-seq="2200">
+          <div class="p-head"><span>PRIVACY</span><span>온디바이스</span></div>
+          <div class="p-label">수신한 문자</div>
+          <div style="font-size:11px;line-height:1.9;color:rgba(23,22,28,.7)">
+            <span class="p-redact">[Web발신] 신한카드(1234)<span class="bar sq-redact" style="--sd:280ms"></span></span><br>
+            <span class="p-redact">고현서님 4,500원 일시불<span class="bar sq-redact" style="--sd:400ms"></span></span><br>
+            <span class="p-redact">누적 1,787,143원 스타벅스<span class="bar sq-redact" style="--sd:520ms"></span></span>
           </div>
+          <hr class="perf">
+          <div class="sq-lock">
+            <div class="p-label">남는 것</div>
+            <div class="p-line" style="padding-top:2px">
+              <span class="t">금액 · 사용처 · 일시</span>
+              <span class="v m">-4,500원</span>
+            </div>
+          </div>
+          <hr class="perf">
+          <div class="p-toggle"><span>신한카드</span><span class="p-sw"><i></i></span></div>
+          <div class="p-toggle" style="opacity:.5"><span>KB국민카드</span><span class="p-sw off"><i></i></span></div>
         </div>
-      </article>
 
-      <article class="tile t-view reveal" style="--d:280ms">
-        <div class="tile-ic" aria-hidden="true">
-          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><rect x="3" y="5" width="18" height="16" rx="2.5"/><path d="M3 10h18M8 3v4M16 3v4"/></svg>
-        </div>
-        <h3>리스트 &amp; 캘린더</h3>
-        <p>월별 합계를 상단에서 확인하고, 리스트와 캘린더 두 방식으로 한 달의 소비 흐름을 살펴봅니다.</p>
-        <div class="visual">
-          <div class="cal-strip">
-            <div><b>03</b><em class="m">-73,442</em></div>
-            <div><b>04</b><em class="m">-19,500</em></div>
-            <div class="on"><b>05</b><em>·</em></div>
-            <div><b>06</b><em>·</em></div>
-            <div><b>21</b><em class="m">-605,000</em></div>
-            <div><b>25</b><em class="p">+4,007,324</em></div>
-            <div><b>29</b><em class="m">-11,900</em></div>
-          </div>
-        </div>
-      </article>
-
-      <article class="tile t-privacy reveal" style="--d:350ms">
-        <div class="tile-ic" aria-hidden="true">
-          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="M12 3l7.5 3.2v5c0 4.6-3.2 8.8-7.5 10.3C7.7 20 4.5 15.8 4.5 11.2v-5z"/><path d="M9 12l2 2 4-4"/></svg>
-        </div>
-        <h3>개인정보 보호</h3>
-        <p>문자에서 금액·사용처·일시만 분석하고 원문은 저장하거나 서버로 보내지 않습니다. 감지할 카드사도 직접 고릅니다.</p>
-        <div class="visual perm">
-          <div class="mini">
-            <span class="lbl">신한카드<i>카드·연관 은행 감지</i></span>
-            <span class="switch on" aria-hidden="true"></span>
-          </div>
-          <div class="mini">
-            <span class="lbl">KB국민카드<i>앱 미설치</i></span>
-            <span class="switch" aria-hidden="true"></span>
-          </div>
-        </div>
-      </article>
+      </div>
     </div>
   </div>
 </section>
@@ -977,6 +1434,137 @@ footer {
       cu.textContent = '+' + Math.round(target * eased).toLocaleString('ko-KR') + '원';
       if (p < 1) requestAnimationFrame(tick);
     })(t0);
+  }
+
+  /* ── 주요 기능: 탭 → 영수증 전환 ── */
+  const nav = document.querySelector('.fx-nav');
+  if (!nav) return;
+  const tabs = [...nav.querySelectorAll('.fx-tab')];
+  const ind = nav.querySelector('.fx-ind');
+  const txts = [...document.querySelectorAll('.fx-txt')];
+  const papers = [...document.querySelectorAll('.paper')];
+  const IND_BASE = 100;
+  let cur = 0, indAnim = null, curX = 0, curS = 0;
+
+  papers.forEach(p => p.style.setProperty('--seq', (p.dataset.seq || 2400) + 'ms'));
+
+  function moveInd(btn, animate) {
+    const x = btn.offsetLeft, s = btn.offsetWidth / IND_BASE;
+    const to = `translate3d(${x}px,0,0) scaleX(${s})`;
+    if (!animate || reduced || !ind.animate) {
+      indAnim && indAnim.cancel();
+      ind.style.transform = to;
+      curX = x; curS = s;
+      return;
+    }
+    const dist = Math.abs(x - curX);
+    const squash = 1 + Math.min(dist / 1200, .12);
+    indAnim && indAnim.cancel();
+    indAnim = ind.animate([
+      { transform: `translate3d(${curX}px,0,0) scaleX(${curS})` },
+      { transform: `translate3d(${curX * .45 + x * .55}px,0,0) scaleX(${s * squash})`, offset: .45 },
+      { transform: to }
+    ], { duration: 280, easing: 'cubic-bezier(.22,1,.36,1)', fill: 'both' });
+    indAnim.finished.then(() => {
+      ind.style.transform = to;
+      indAnim && indAnim.cancel();
+      indAnim = null;
+    }).catch(() => {});
+    curX = x; curS = s;
+  }
+
+  function play(i) {
+    const p = papers[i];
+    if (!p || reduced) return;
+    p.classList.remove('is-playing');
+    void p.offsetWidth;
+    p.classList.add('is-playing');
+  }
+
+  function select(i) {
+    if (i === cur) { play(i); return; }
+    const dir = i > cur ? 1 : -1;
+
+    tabs.forEach((t, k) => {
+      t.setAttribute('aria-selected', k === i);
+      t.tabIndex = k === i ? 0 : -1;
+    });
+    tabs[i].classList.add('is-seen');
+    moveInd(tabs[i], true);
+
+    txts.forEach((t, k) => {
+      if (k === i) {
+        t.hidden = false;
+        t.classList.remove('is-out');
+        void t.offsetWidth;
+        t.classList.add('is-in');
+      } else if (t.classList.contains('is-in')) {
+        t.classList.remove('is-in');
+        t.classList.add('is-out');
+        setTimeout(() => { if (!t.classList.contains('is-in')) { t.classList.remove('is-out'); t.hidden = true; } }, 130);
+      }
+    });
+
+    papers.forEach((p, k) => {
+      p.style.setProperty('--dir', dir);
+      if (k === i) {
+        p.classList.remove('is-out', 'is-playing');
+        p.style.willChange = 'transform, opacity';
+        void p.offsetWidth;
+        p.classList.add('is-in');
+        p.addEventListener('transitionend', function done(e) {
+          if (e.target !== p || e.propertyName !== 'transform') return;
+          p.style.willChange = '';
+          p.removeEventListener('transitionend', done);
+          play(i);
+        });
+      } else if (p.classList.contains('is-in')) {
+        p.classList.replace('is-in', 'is-out');
+      }
+    });
+    cur = i;
+  }
+
+  tabs.forEach((t, i) => {
+    t.addEventListener('click', () => select(i));
+    t.addEventListener('pointerdown', () => t.classList.add('is-pressed'));
+    ['pointerup', 'pointerleave', 'pointercancel', 'blur'].forEach(ev =>
+      t.addEventListener(ev, () => t.classList.remove('is-pressed')));
+  });
+  nav.addEventListener('keydown', e => {
+    const i = tabs.indexOf(document.activeElement);
+    if (i < 0) return;
+    const map = { ArrowRight: i + 1, ArrowLeft: i - 1, Home: 0, End: tabs.length - 1 };
+    if (!(e.key in map)) return;
+    e.preventDefault();
+    const n = (map[e.key] + tabs.length) % tabs.length;
+    select(n);
+    tabs[n].focus();
+  });
+
+  const placeInd = () => moveInd(tabs[cur], false);
+  addEventListener('load', placeInd);
+  if ('ResizeObserver' in window) new ResizeObserver(placeInd).observe(nav);
+  placeInd();
+
+  /* 섹션 진입 시 1번만 1회 재생 + 나머지 인덱스 한 번 훑기 (자동 순환 없음) */
+  if ('IntersectionObserver' in window && !reduced) {
+    const so = new IntersectionObserver(([e]) => {
+      if (!e.isIntersecting) return;
+      so.disconnect();
+      play(0);
+      tabs[0].classList.add('is-seen');
+      setTimeout(() => {
+        if (cur !== 0) return;
+        tabs.slice(1).forEach((t, k) => {
+          const ix = t.querySelector('.ix');
+          ix && ix.animate && ix.animate(
+            [{ opacity: .3 }, { opacity: 1 }, { opacity: .3 }],
+            { duration: 520, delay: k * 70, easing: 'cubic-bezier(.22,1,.36,1)' });
+        });
+      }, 2800);
+    }, { threshold: .4 });
+    so.observe(document.querySelector('.fx-stage'));
   }
 })();
 </script>

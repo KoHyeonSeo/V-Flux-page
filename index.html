@@ -21,6 +21,8 @@
   --accent-wash: #EDEAFB;
   --minus: #2A5BD7;
   --plus: #C81E4E;
+  --app-top: linear-gradient(135deg, #2D1B8F 0%, #6C5CE7 100%);  /* 실제 앱 헤더 */
+  --app-canvas: #F5F4FA;
 
   --sans: "Pretendard Variable", Pretendard, -apple-system, BlinkMacSystemFont, "Segoe UI", "Malgun Gothic", sans-serif;
   --mono: "JetBrains Mono", ui-monospace, SFMono-Regular, Menlo, monospace;
@@ -237,7 +239,7 @@ svg { display: block; }
 .screen {
   border-radius: 32px;
   overflow: hidden;
-  background: var(--canvas);
+  background: var(--app-canvas);
   color: var(--ink);
 }
 .sbar {
@@ -245,21 +247,32 @@ svg { display: block; }
   justify-content: space-between;
   align-items: center;
   padding: 10px 18px 0;
-  background: var(--shell-2);
-  color: rgba(255, 255, 255, .9);
+  background: var(--app-top);
+  color: rgba(255, 255, 255, .92);
   font-family: var(--mono);
   font-size: 10.5px;
   font-weight: 500;
 }
-.sbar .sig { display: flex; gap: 4px; align-items: center; opacity: .8; }
+.sbar .sig { display: flex; gap: 4px; align-items: center; opacity: .85; }
 .shead {
-  background: var(--shell-2);
+  background: var(--app-top);
   color: #fff;
-  padding: 12px 18px 16px;
+  padding: 10px 18px 18px;
 }
-.shead .h { font-size: 15px; font-weight: 700; letter-spacing: -.02em; }
-.shead .s { font-family: var(--mono); font-size: 10px; color: rgba(255, 255, 255, .45); margin-top: 2px; }
-.sbody { padding: 12px; }
+.shead .h { font-size: 17px; font-weight: 800; letter-spacing: -.03em; }
+.shead .s { font-size: 10px; color: rgba(255, 255, 255, .68); margin-top: 2px; letter-spacing: -.01em; }
+/* 높이 고정 — 자동입력 애니메이션이 폰 크기를 바꾸지 않도록 */
+.sbody { padding: 12px; height: 434px; overflow: hidden; }
+.daygroup {
+  display: flex;
+  justify-content: space-between;
+  align-items: baseline;
+  padding: 4px 3px 7px;
+  font-family: var(--mono);
+  font-size: 10px;
+  font-weight: 500;
+  color: rgba(23, 22, 28, .5);
+}
 
 .summary {
   display: flex;
@@ -326,16 +339,16 @@ svg { display: block; }
   margin-bottom: 7px;
 }
 .tag {
-  font-family: var(--mono);
-  font-size: 8.5px;
-  font-weight: 500;
-  padding: 3px 7px;
-  border-radius: 5px;
+  font-size: 9.5px;
+  font-weight: 700;
+  padding: 4px 9px;
+  border-radius: 999px;
   flex-shrink: 0;
-  letter-spacing: .04em;
+  letter-spacing: -.02em;
 }
-.tag.out { background: rgba(42, 91, 215, .09); color: var(--minus); }
-.tag.in  { background: rgba(200, 30, 78, .08); color: var(--plus); }
+.tag.out { background: #E4EDFD; color: var(--minus); }
+.tag.in  { background: #FBE4EB; color: var(--plus); }
+.chev { color: rgba(23, 22, 28, .28); font-size: 13px; flex-shrink: 0; line-height: 1; }
 .row .nm { flex: 1; min-width: 0; font-size: 11.5px; font-weight: 600; letter-spacing: -.01em; }
 .row .nm i {
   display: block;
@@ -362,13 +375,11 @@ svg { display: block; }
   padding: 2px 6px;
   flex-shrink: 0;
 }
-.row.landed {
-  animation: land 8s var(--ease) infinite;
-  overflow: hidden;
-}
+/* 새 내역 착지 — opacity/transform만 사용해 폰 높이가 변하지 않게 한다 */
+.row.landed { animation: land 8s var(--ease) infinite; }
 @keyframes land {
-  0%, 45%   { opacity: 0; transform: translateY(-10px); max-height: 0; margin-bottom: 0; padding-top: 0; padding-bottom: 0; border-width: 0; }
-  55%, 100% { opacity: 1; transform: none; max-height: 54px; margin-bottom: 7px; padding-top: 10px; padding-bottom: 10px; border-width: 1px; }
+  0%, 45%   { opacity: 0; transform: translate3d(0, -8px, 0) scale(.985); }
+  55%, 100% { opacity: 1; transform: none; }
 }
 .home-bar {
   width: 104px; height: 4px;
@@ -510,12 +521,14 @@ section { padding: var(--pad) 0; }
 .fx-txt .meta {
   display: inline-block;
   margin-top: 18px;
-  font-family: var(--mono);
-  font-size: 11px;
-  letter-spacing: .1em;
-  color: rgba(242, 241, 245, .38);
+  font-size: 12.5px;
+  font-weight: 500;
+  letter-spacing: -.015em;   /* 한글이 모노로 폴백되지 않도록 본문 서체 사용 */
+  line-height: 1.7;
+  color: rgba(242, 241, 245, .42);
   border-top: 1px solid rgba(242, 241, 245, .16);
   padding-top: 10px;
+  word-break: keep-all;
 }
 .fx-txt h3, .fx-txt p, .fx-txt .meta {
   opacity: 0;
@@ -535,7 +548,7 @@ section { padding: var(--pad) 0; }
   transition: opacity 120ms var(--ease-in), transform 120ms var(--ease-in);
 }
 
-/* ── 영수증 ── */
+/* ── 미리보기: 실제 앱 화면 시트 ── */
 .fx-papers {
   display: grid;
   justify-items: center;
@@ -543,12 +556,12 @@ section { padding: var(--pad) 0; }
 }
 .paper {
   grid-area: 1 / 1;
-  width: min(400px, 100%);
-  background: #FAF9FB;
+  width: min(376px, 100%);
+  background: var(--app-canvas);
   color: var(--ink);
-  padding: 22px 22px 26px;
-  border-radius: 3px;
-  filter: drop-shadow(0 30px 46px rgba(0, 0, 0, .5));
+  border-radius: 16px;
+  overflow: hidden;
+  filter: drop-shadow(0 30px 48px rgba(0, 0, 0, .52));
   opacity: 0;
   visibility: hidden;
   transform: rotate(-0.7deg) translate3d(calc(var(--dir, 1) * 24px), 0, 0);
@@ -571,69 +584,50 @@ section { padding: var(--pad) 0; }
     transform var(--d-out) var(--ease-in),
     visibility 0s linear var(--d-out);
 }
-.p-head {
-  display: flex;
-  justify-content: space-between;
-  align-items: baseline;
-  font-family: var(--mono);
+/* 앱 상단 바 */
+.p-top {
+  background: var(--app-top);
+  color: #fff;
+  padding: 15px 17px 16px;
+}
+.p-top .bc {
   font-size: 9.5px;
-  letter-spacing: .2em;
-  color: rgba(23, 22, 28, .42);
-  padding-bottom: 11px;
-  border-bottom: 1px dashed rgba(23, 22, 28, .3);
-  margin-bottom: 14px;
+  color: rgba(255, 255, 255, .62);
+  letter-spacing: -.01em;
+  margin-bottom: 3px;
 }
-.perf {
-  border: 0;
-  border-top: 1px dashed rgba(23, 22, 28, .26);
-  margin: 14px -22px;
+.p-top .t { font-size: 16px; font-weight: 800; letter-spacing: -.03em; }
+.p-top .s { font-size: 10px; color: rgba(255, 255, 255, .68); margin-top: 2px; letter-spacing: -.01em; }
+.p-body { padding: 13px; min-height: 268px; }
+
+/* 앱 카드 공통 */
+.card {
+  background: #fff;
+  border-radius: 13px;
+  padding: 11px 13px;
+  box-shadow: 0 2px 8px rgba(45, 27, 143, .05);
 }
-.p-label {
-  font-family: var(--mono);
-  font-size: 9.5px;
-  letter-spacing: .16em;
-  color: rgba(23, 22, 28, .4);
-  margin-bottom: 8px;
-}
-.p-big {
-  font-family: var(--mono);
-  font-size: clamp(2.1rem, 4.6vw, 2.85rem);
-  font-weight: 700;
-  letter-spacing: -.035em;
-  line-height: 1;
-  font-variant-numeric: tabular-nums;
-}
-.p-big .won {
-  font-family: var(--sans);
-  font-size: .32em;
-  font-weight: 600;
-  letter-spacing: -.02em;
-  margin-left: .12em;
-  vertical-align: .14em;
-}
-.p-big.m { color: var(--minus); }
-.p-big.p { color: var(--plus); }
+.card + .card { margin-top: 8px; }
 .p-line {
   display: flex;
   align-items: center;
   gap: 9px;
-  padding: 9px 0;
 }
-.p-line + .p-line { border-top: 1px solid rgba(23, 22, 28, .08); }
 .p-line .t {
   flex: 1;
   min-width: 0;
   font-size: 12.5px;
-  font-weight: 600;
-  letter-spacing: -.015em;
+  font-weight: 700;
+  letter-spacing: -.02em;
 }
 .p-line .t i {
   display: block;
   font-style: normal;
   font-size: 10px;
   font-weight: 400;
-  color: rgba(23, 22, 28, .45);
+  color: rgba(23, 22, 28, .48);
   margin-top: 2px;
+  letter-spacing: -.01em;
 }
 .p-line .v {
   font-family: var(--mono);
@@ -644,104 +638,246 @@ section { padding: var(--pad) 0; }
 }
 .p-line .v.m { color: var(--minus); }
 .p-line .v.p { color: var(--plus); }
-.p-foot {
+.p-day {
+  display: flex;
+  justify-content: space-between;
+  align-items: baseline;
+  padding: 9px 3px 6px;
   font-family: var(--mono);
   font-size: 10px;
-  letter-spacing: .12em;
-  color: rgba(23, 22, 28, .4);
+  color: rgba(23, 22, 28, .5);
+}
+.p-sum {
+  display: flex;
+  justify-content: space-between;
+  gap: 6px;
+  background: #fff;
+  border-radius: 13px;
+  padding: 11px 13px;
+  box-shadow: 0 2px 8px rgba(45, 27, 143, .05);
+  margin-bottom: 10px;
+}
+.p-sum div { text-align: center; min-width: 0; }
+.p-sum dt { font-size: 9px; color: rgba(23, 22, 28, .5); margin-bottom: 3px; letter-spacing: -.01em; }
+.p-sum dd { font-family: var(--mono); font-size: 11px; font-weight: 700; white-space: nowrap; font-variant-numeric: tabular-nums; }
+.p-sum dd.m { color: var(--minus); }
+.p-sum dd.p { color: var(--plus); }
+.p-label {
+  font-size: 10px;
+  font-weight: 600;
+  color: rgba(23, 22, 28, .45);
+  letter-spacing: -.01em;
+  margin-bottom: 7px;
+}
+.p-foot {
+  font-size: 10.5px;
+  color: rgba(23, 22, 28, .45);
   text-align: right;
-  margin-top: 12px;
+  margin-top: 10px;
+  letter-spacing: -.01em;
 }
 .p-sms {
-  background: rgba(23, 22, 28, .045);
-  border-radius: 2px 10px 10px 10px;
+  background: #fff;
+  border: 1px dashed rgba(108, 92, 231, .38);
+  border-radius: 2px 12px 12px 12px;
   padding: 10px 12px;
   font-size: 11px;
   line-height: 1.55;
-  color: rgba(23, 22, 28, .72);
+  color: rgba(23, 22, 28, .7);
+  letter-spacing: -.01em;
 }
-.p-sms b { font-weight: 700; color: var(--ink); }
-.p-chips { display: flex; flex-wrap: wrap; gap: 4px; margin-top: 12px; }
+.p-sms b { font-weight: 700; color: var(--ink); display: block; margin-bottom: 2px; }
+.flowline {
+  display: flex;
+  align-items: center;
+  gap: 7px;
+  margin: 9px 2px;
+  color: var(--accent);
+  font-size: 10px;
+  font-weight: 600;
+  letter-spacing: -.01em;
+}
+.flowline::after { content: ""; flex: 1; height: 1px; background: rgba(108, 92, 231, .22); }
+.flowline svg { width: 13px; height: 13px; }
+.p-chips { display: flex; flex-wrap: wrap; gap: 5px; margin-top: 11px; }
 .p-chips span {
-  font-family: var(--mono);
-  font-size: 9.5px;
-  color: rgba(23, 22, 28, .5);
-  border: 1px solid rgba(23, 22, 28, .16);
-  border-radius: 3px;
-  padding: 3px 7px;
+  font-size: 10px;
+  font-weight: 600;
+  letter-spacing: -.02em;
+  color: rgba(45, 27, 143, .72);
+  background: #fff;
+  border: 1px solid rgba(108, 92, 231, .18);
+  border-radius: 999px;
+  padding: 4px 9px;
 }
 .p-badge {
-  font-family: var(--mono);
   font-size: 8.5px;
-  font-weight: 500;
-  letter-spacing: .08em;
+  font-weight: 700;
+  letter-spacing: -.02em;
   color: var(--accent);
-  border: 1px solid rgba(91, 75, 214, .38);
+  background: rgba(108, 92, 231, .1);
   border-radius: 999px;
-  padding: 2px 7px;
+  padding: 3px 7px;
   flex-shrink: 0;
 }
+/* 세그먼트 (리스트/캘린더) */
 .p-seg {
   display: flex;
   position: relative;
-  background: rgba(23, 22, 28, .06);
-  border-radius: 4px;
-  padding: 3px;
-  margin-bottom: 14px;
+  background: #EDEAF7;
+  border-radius: 11px;
+  padding: 4px;
+  margin-bottom: 11px;
 }
 .p-seg span {
   flex: 1;
   text-align: center;
-  font-size: 11px;
+  font-size: 11.5px;
   font-weight: 700;
-  padding: 5px 0;
+  padding: 6px 0;
   position: relative;
   z-index: 1;
   color: rgba(23, 22, 28, .45);
+  letter-spacing: -.02em;
 }
-.p-seg span:last-child { color: var(--ink); }
+.p-seg span:last-child { color: #fff; }
 .p-seg .knob {
   position: absolute;
-  top: 3px; left: 3px; bottom: 3px;
-  width: calc(50% - 3px);
-  background: #FAF9FB;
-  border-radius: 3px;
-  box-shadow: 0 1px 3px rgba(23, 22, 28, .14);
+  top: 4px; left: 4px; bottom: 4px;
+  width: calc(50% - 4px);
+  background: #4B3BC4;
+  border-radius: 8px;
   transform: translate3d(100%, 0, 0);
 }
-.p-cal { display: grid; grid-template-columns: repeat(7, 1fr); gap: 3px; }
-.p-cal .dw {
-  font-family: var(--mono);
-  font-size: 8px;
-  text-align: center;
-  color: rgba(23, 22, 28, .35);
-  padding-bottom: 3px;
+/* 캘린더 */
+.p-cal {
+  display: grid;
+  grid-template-columns: repeat(7, 1fr);
+  gap: 3px;
+  background: #fff;
+  border-radius: 13px;
+  padding: 10px 8px;
+  box-shadow: 0 2px 8px rgba(45, 27, 143, .05);
 }
+.p-cal .dw { font-size: 8.5px; text-align: center; color: rgba(23, 22, 28, .38); padding-bottom: 3px; }
 .p-cal .cell {
-  min-height: 30px;
-  border-radius: 3px;
+  min-height: 31px;
+  border-radius: 6px;
   text-align: center;
   padding-top: 3px;
   font-family: var(--mono);
   font-size: 9.5px;
   color: rgba(23, 22, 28, .62);
 }
-.p-cal .cell em {
-  display: block;
-  font-style: normal;
-  font-size: 7.5px;
-  font-weight: 700;
-  margin-top: 2px;
-}
+.p-cal .cell em { display: block; font-style: normal; font-size: 7.5px; font-weight: 700; margin-top: 2px; }
 .p-cal .cell em.m { color: var(--minus); }
 .p-cal .cell em.p { color: var(--plus); }
-.p-cal .cell.on { background: rgba(91, 75, 214, .1); color: var(--ink); font-weight: 700; }
-.p-redact {
+.p-cal .cell.on { background: #EDEAF7; color: var(--ink); font-weight: 700; }
+/* 계산기 */
+.p-field {
+  background: #fff;
+  border-radius: 13px;
+  padding: 12px 14px;
+  box-shadow: 0 2px 8px rgba(45, 27, 143, .05);
+}
+.p-expr {
+  font-family: var(--mono);
+  font-size: 13px;
+  color: rgba(23, 22, 28, .5);
   position: relative;
   display: inline-block;
-  font-size: 11px;
-  line-height: 1.9;
 }
+.p-expr .mask { position: absolute; inset: -2px -3px; background: #fff; transform-origin: 100% 50%; }
+.p-res { font-family: var(--mono); font-size: 25px; font-weight: 700; letter-spacing: -.03em; margin-top: 4px; font-variant-numeric: tabular-nums; }
+.p-keys { display: grid; grid-template-columns: repeat(4, 1fr); gap: 5px; margin-top: 11px; }
+.p-keys i {
+  font-style: normal;
+  background: #fff;
+  border-radius: 9px;
+  text-align: center;
+  padding: 8px 0;
+  font-size: 12px;
+  font-weight: 700;
+  color: #4B3BC4;
+  box-shadow: 0 1px 4px rgba(45, 27, 143, .05);
+}
+.p-keys i.op { background: #EDEAF7; }
+.p-keys i.eq { background: #6C5CE7; color: #fff; }
+.p-apply {
+  margin-top: 9px;
+  background: #6C5CE7;
+  color: #fff;
+  text-align: center;
+  border-radius: 11px;
+  padding: 9px 0;
+  font-size: 12px;
+  font-weight: 700;
+  letter-spacing: -.02em;
+}
+/* 동기화 */
+.p-sync { display: flex; align-items: center; justify-content: center; gap: 11px; padding: 8px 0 4px; position: relative; }
+.p-sync .dev {
+  width: 46px; height: 66px;
+  border: 1.5px solid rgba(108, 92, 231, .35);
+  border-radius: 8px;
+  background: #fff;
+  display: grid;
+  gap: 3px;
+  align-content: start;
+  padding: 7px 5px;
+}
+.p-sync .dev b { height: 4px; border-radius: 1px; background: rgba(23, 22, 28, .13); display: block; }
+.p-sync .dev b.hi { background: var(--minus); }
+.p-sync .arc { flex: 1; height: 1px; background: repeating-linear-gradient(90deg, rgba(108,92,231,.4) 0 3px, transparent 3px 7px); }
+.p-sync .cl { color: var(--accent); }
+.p-sync .cl svg { width: 24px; height: 24px; }
+/* 권한 토글 */
+.p-toggle {
+  display: flex;
+  align-items: center;
+  gap: 9px;
+  background: #fff;
+  border-radius: 13px;
+  padding: 10px 13px;
+  box-shadow: 0 2px 8px rgba(45, 27, 143, .05);
+  font-size: 12px;
+  font-weight: 700;
+  letter-spacing: -.02em;
+}
+.p-toggle + .p-toggle { margin-top: 7px; }
+.p-toggle span:first-child { flex: 1; }
+.p-toggle small { display: block; font-size: 9.5px; font-weight: 500; margin-top: 2px; }
+.p-toggle small.ok { color: #12864F; }
+.p-toggle small.no { color: rgba(23, 22, 28, .42); }
+.p-sw {
+  width: 34px; height: 20px;
+  border-radius: 999px;
+  background: #6C5CE7;
+  position: relative;
+  flex-shrink: 0;
+}
+.p-sw i {
+  position: absolute;
+  top: 2px; left: 2px;
+  width: 16px; height: 16px;
+  border-radius: 50%;
+  background: #fff;
+  transform: translate3d(14px, 0, 0);
+}
+.p-sw.off { background: #B6B3C4; }
+.p-sw.off i { transform: none; }
+.p-allow {
+  font-size: 10px;
+  font-weight: 700;
+  color: #fff;
+  background: #6C5CE7;
+  border-radius: 999px;
+  padding: 5px 11px;
+  flex-shrink: 0;
+  letter-spacing: -.02em;
+}
+/* 문자 원문 먹칠 */
+.p-redact { position: relative; display: inline-block; font-size: 11px; line-height: 1.9; letter-spacing: -.01em; }
 .p-redact .bar {
   position: absolute;
   left: -2px; top: 12%;
@@ -750,62 +886,6 @@ section { padding: var(--pad) 0; }
   background: #17161C;
   transform-origin: 0 50%;
   transform: scaleX(1);
-}
-.p-toggle {
-  display: flex;
-  align-items: center;
-  gap: 9px;
-  padding: 8px 0;
-  font-size: 11.5px;
-  font-weight: 600;
-}
-.p-toggle span:first-child { flex: 1; }
-.p-sw {
-  width: 30px; height: 18px;
-  border-radius: 999px;
-  background: var(--accent);
-  position: relative;
-  flex-shrink: 0;
-}
-.p-sw i {
-  position: absolute;
-  top: 2px; left: 2px;
-  width: 14px; height: 14px;
-  border-radius: 50%;
-  background: #fff;
-  transform: translate3d(12px, 0, 0);
-}
-.p-sw.off { background: rgba(23, 22, 28, .18); }
-.p-sw.off i { transform: none; }
-.p-sync { display: flex; align-items: center; justify-content: center; gap: 12px; padding: 4px 0 2px; }
-.p-sync .dev {
-  width: 44px; height: 62px;
-  border: 1.5px solid rgba(23, 22, 28, .3);
-  border-radius: 6px;
-  display: grid;
-  gap: 3px;
-  align-content: start;
-  padding: 7px 5px;
-}
-.p-sync .dev b { height: 4px; border-radius: 1px; background: rgba(23, 22, 28, .16); display: block; }
-.p-sync .dev b.hi { background: var(--minus); }
-.p-sync .arc { flex: 1; height: 1px; background: repeating-linear-gradient(90deg, rgba(23,22,28,.3) 0 3px, transparent 3px 7px); }
-.p-sync .cl { color: rgba(23, 22, 28, .55); }
-.p-sync .cl svg { width: 22px; height: 22px; }
-.p-expr {
-  font-family: var(--mono);
-  font-size: 19px;
-  font-weight: 500;
-  letter-spacing: -.01em;
-  color: rgba(23, 22, 28, .55);
-  position: relative;
-  display: inline-block;
-}
-.p-expr .mask {
-  position: absolute;
-  inset: -2px -3px;
-  background: #FAF9FB;
-  transform-origin: 100% 50%;
 }
 
 /* ── 시퀀스 (선택 시 1회 재생) ── */
@@ -1081,7 +1161,7 @@ footer {
           </div>
           <div class="shead">
             <div class="h">가계부</div>
-            <div class="s">2026.08</div>
+            <div class="s">수입/지출을 한눈에 확인하고 빠르게 기록하세요</div>
           </div>
           <div class="sbody">
             <dl class="summary">
@@ -1102,21 +1182,26 @@ footer {
               </div>
             </div>
 
+            <div class="daygroup"><span>2026-08-05</span><span>-4,500원</span></div>
             <div class="row landed">
               <span class="tag out">지출</span>
-              <span class="nm">커피<i>신한카드 · 문자 감지</i></span>
-              <span class="auto-badge">AUTO</span>
+              <span class="nm">커피<i>자동 감지 · 신한카드 · 문자</i></span>
               <span class="amt m num">-4,500원</span>
+              <span class="chev">›</span>
             </div>
-            <div class="row">
-              <span class="tag in">수입</span>
-              <span class="nm">월급<i>2026-07-25</i></span>
-              <span class="amt p num">+4,007,324원</span>
-            </div>
+            <div class="daygroup"><span>2026-08-21</span><span>-605,000원</span></div>
             <div class="row">
               <span class="tag out">지출</span>
               <span class="nm">월세, 공과금<i>매월 21일 · 반복</i></span>
               <span class="amt m num">-605,000원</span>
+              <span class="chev">›</span>
+            </div>
+            <div class="daygroup"><span>2026-07-25</span><span>+4,007,324원</span></div>
+            <div class="row">
+              <span class="tag in">수입</span>
+              <span class="nm">월급</span>
+              <span class="amt p num">+4,007,324원</span>
+              <span class="chev">›</span>
             </div>
           </div>
           <div class="home-bar"></div>
@@ -1134,7 +1219,7 @@ footer {
         <span class="eyebrow">주요 기능</span>
         <h2>여섯 가지를<br>눌러서 확인하세요</h2>
       </div>
-      <p>기능을 고르면 그 기능이 실제로 무엇을 하는지 영수증 위에 다시 인쇄됩니다.</p>
+      <p>궁금한 기능을 눌러보세요. 그 기능이 실제 앱에서 어떻게 보이는지 화면으로 확인할 수 있어요.</p>
     </div>
 
     <div class="fx-nav reveal" role="tablist" aria-label="주요 기능">
@@ -1163,174 +1248,227 @@ footer {
       <!-- 설명 -->
       <div class="fx-copy">
         <div class="fx-txt is-in" role="tabpanel" id="p0" aria-labelledby="t0" tabindex="0">
-          <h3>결제하면<br>가계부가 먼저 적습니다</h3>
-          <p>카드 승인 문자와 은행 입출금 알림이 도착하면 금액과 사용처, 일시를 읽어 그 자리에서 내역을 만듭니다. 앱을 열 필요도, 영수증을 모을 필요도 없습니다.</p>
+          <h3>카드 쓰면<br>가계부에 알아서 올라와요</h3>
+          <p>결제 문자가 오면 금액과 사용처를 읽어 바로 내역으로 만들어요. 영수증을 모아뒀다가 나중에 옮겨 적을 필요가 없어요.</p>
           <span class="meta">신한 · KB국민 · 현대 · 삼성 · 롯데 · 하나 · 우리 · NH농협 · BC</span>
         </div>
         <div class="fx-txt" role="tabpanel" id="p1" aria-labelledby="t1" tabindex="0" hidden>
-          <h3>한 번 정하면<br>1년 치가 깔립니다</h3>
-          <p>월세와 구독료는 매달 똑같이 나갑니다. 주기와 기간만 지정하면 저장하는 순간 그 기간의 내역이 한꺼번에 생성됩니다.</p>
-          <span class="meta">매일 · 매주 · 매월 · 시작일과 마감일 포함</span>
+          <h3>매달 똑같은 지출,<br>한 번만 등록하세요</h3>
+          <p>월세도 구독료도 매달 손으로 적을 필요 없어요. 주기와 기간만 정하면 그 기간의 내역이 한꺼번에 만들어져요.</p>
+          <span class="meta">매일 · 매주 · 매월 · 시작일과 마감일까지 포함</span>
         </div>
         <div class="fx-txt" role="tabpanel" id="p2" aria-labelledby="t2" tabindex="0" hidden>
-          <h3>더치페이,<br>암산하지 마세요</h3>
-          <p>금액 칸이 곧 계산기입니다.</p>
-          <span class="meta">계산 결과를 그대로 금액에 적용</span>
+          <h3>더치페이 계산,<br>제가 대신 해드릴게요</h3>
+          <p>계산기 앱을 따로 켜지 마세요. 금액 칸에서 바로 계산하고 그 결과가 그대로 들어가요.</p>
+          <span class="meta">계산 결과를 금액에 바로 적용</span>
         </div>
         <div class="fx-txt" role="tabpanel" id="p3" aria-labelledby="t3" tabindex="0" hidden>
-          <h3>한 달을<br>한 장으로 봅니다</h3>
-          <p>리스트로 훑고 캘린더로 짚습니다. 어느 날 얼마를 썼는지 달력 위에서 바로 읽히고, 날짜를 누르면 그날의 내역으로 들어갑니다.</p>
-          <span class="meta">월별 합계 · 리스트 · 캘린더</span>
+          <h3>이번 달 어디에 썼는지<br>한눈에 보여요</h3>
+          <p>목록으로 훑어보고 달력으로 짚어보세요. 날짜를 누르면 그날 쓴 내역만 모아서 보여드려요.</p>
+          <span class="meta">월별 합계 · 리스트 보기 · 캘린더 보기</span>
         </div>
         <div class="fx-txt" role="tabpanel" id="p4" aria-labelledby="t4" tabindex="0" hidden>
-          <h3>기기를 바꿔도<br>기록은 그대로</h3>
-          <p>Google 계정으로 로그인하면 적은 내역이 곧바로 백업됩니다. 새 폰에서 로그인하는 것으로 복원은 끝납니다.</p>
-          <span class="meta">Google 로그인 · Firebase 백업</span>
+          <h3>폰을 바꿔도<br>기록은 그대로 따라와요</h3>
+          <p>적어둔 내역은 자동으로 백업돼요. 새 기기에서 로그인만 하면 쓰던 그대로 이어서 쓸 수 있어요.</p>
+          <span class="meta">Google 로그인 · 자동 백업</span>
         </div>
         <div class="fx-txt" role="tabpanel" id="p5" aria-labelledby="t5" tabindex="0" hidden>
-          <h3>문자 원문은<br>남기지 않습니다</h3>
-          <p>분석은 기기 안에서 끝나고, 금액과 사용처와 일시만 남습니다. 원문은 저장하지도 서버로 보내지도 않으며, 감지할 카드사도 직접 고릅니다.</p>
-          <span class="meta">온디바이스 분석 · 카드사별 on/off</span>
+          <h3>내 문자는<br>폰 밖으로 나가지 않아요</h3>
+          <p>금액과 사용처, 일시만 폰 안에서 읽고 문자 내용은 지웁니다. 어느 카드사를 읽을지도 직접 정할 수 있어요.</p>
+          <span class="meta">문자 원문 저장 안 함 · 카드사별 켜고 끄기</span>
         </div>
       </div>
 
-      <!-- 영수증 -->
+      <!-- 앱 화면 미리보기 -->
       <div class="fx-papers" aria-hidden="true">
 
         <!-- 01 자동입력 -->
         <div class="paper is-in" data-seq="2600">
-          <div class="p-head"><span>SHINHAN CARD</span><span>08/05 17:38</span></div>
-          <div class="p-sms sq-sms"><b>[Web발신] 신한카드 승인</b><br>4,500원 일시불 · 스타벅스 강남</div>
-          <div style="position:relative;overflow:hidden;margin:12px -22px 0;padding:0 22px">
-            <div class="sq-scan" style="position:absolute;inset:0;background:linear-gradient(180deg,transparent,rgba(91,75,214,.18) 45%,rgba(91,75,214,.36),transparent)"></div>
-            <div class="p-label">기기 내 분석</div>
+          <div class="p-top">
+            <div class="t">가계부</div>
+            <div class="s">수입/지출을 한눈에 확인하고 빠르게 기록하세요</div>
           </div>
-          <hr class="perf">
-          <div class="p-label">지출</div>
-          <div class="p-big m sq-fade">-4,500<span class="won">원</span></div>
-          <div class="sq-vp" style="margin-top:12px">
-            <div class="sq-grow">
-              <div class="p-line">
-                <span class="t">커피<i>신한카드 · 문자 감지</i></span>
-                <span class="p-badge sq-badge">AUTO</span>
-                <span class="v m">-4,500원</span>
-              </div>
-              <div class="p-line">
-                <span class="t">고현서<i>신한은행 · 문자 감지</i></span>
-                <span class="v m">-100원</span>
+          <div class="p-body">
+            <div class="p-sms sq-sms"><b>[Web발신] 신한카드 승인</b>4,500원 일시불 · 스타벅스 강남</div>
+            <div style="position:relative;overflow:hidden">
+              <div class="sq-scan" style="position:absolute;inset:0;background:linear-gradient(180deg,transparent,rgba(108,92,231,.2) 45%,rgba(108,92,231,.4),transparent)"></div>
+              <div class="flowline">
+                <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M12 5v14M6 13l6 6 6-6"/></svg>
+                문자에서 금액·사용처만 읽어요
               </div>
             </div>
-          </div>
-          <div class="p-chips">
-            <span>신한</span><span>KB국민</span><span>현대</span><span>삼성</span><span>롯데</span><span>하나</span><span>우리</span><span>NH농협</span><span>BC</span>
+            <div class="p-day"><span>2026-08-05</span><span>-4,600원</span></div>
+            <div class="sq-vp">
+              <div class="sq-grow">
+                <div class="card">
+                  <div class="p-line">
+                    <span class="tag out">지출</span>
+                    <span class="t">커피<i>자동 감지 · 신한카드 · 문자</i></span>
+                    <span class="p-badge sq-badge">자동</span>
+                    <span class="v m">-4,500원</span>
+                    <span class="chev">›</span>
+                  </div>
+                </div>
+                <div class="card">
+                  <div class="p-line">
+                    <span class="tag out">지출</span>
+                    <span class="t">고현서<i>자동 감지 · 신한은행 · 문자</i></span>
+                    <span class="v m">-100원</span>
+                    <span class="chev">›</span>
+                  </div>
+                </div>
+              </div>
+            </div>
+            <div class="p-chips">
+              <span>신한</span><span>KB국민</span><span>현대</span><span>삼성</span><span>롯데</span><span>하나</span><span>우리</span><span>NH농협</span><span>BC</span>
+            </div>
           </div>
         </div>
 
         <!-- 02 반복 -->
         <div class="paper" data-seq="2400">
-          <div class="p-head"><span>RECURRING</span><span>매월 21일</span></div>
-          <div class="p-line" style="padding-top:0">
-            <span class="t">월세, 공과금<i>2026.08.20 ~ 2028.03.25</i></span>
-            <span class="v m">-605,000원</span>
+          <div class="p-top">
+            <div class="bc">가계부 &gt; 반복 관리</div>
+            <div class="t">반복 수입·지출</div>
+            <div class="s">정기 내역을 미리 등록하고 관리해요</div>
           </div>
-          <hr class="perf">
-          <div class="p-label">저장 즉시 생성됨</div>
-          <div class="p-line sq-stack" style="--sd:340ms"><span class="t">2026-08-21</span><span class="v m">-605,000원</span></div>
-          <div class="p-line sq-stack" style="--sd:400ms"><span class="t">2026-09-21</span><span class="v m">-605,000원</span></div>
-          <div class="p-line sq-stack" style="--sd:470ms"><span class="t">2026-10-21</span><span class="v m">-605,000원</span></div>
-          <div class="p-line sq-stack" style="--sd:600ms"><span class="t">2026-11-21</span><span class="v m">-605,000원</span></div>
-          <div class="p-line sq-stack" style="--sd:790ms;--fo:.45"><span class="t">2026-12-21</span><span class="v m">-605,000원</span></div>
-          <div class="p-foot">20건 생성</div>
+          <div class="p-body">
+            <div class="card">
+              <div class="p-line">
+                <span class="tag out">지출</span>
+                <span class="t">월세, 공과금<i>매월 21일 · 2026-08-20 ~ 2028-03-25</i></span>
+                <span class="v m">-605,000원</span>
+              </div>
+            </div>
+            <div class="flowline">
+              <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M12 5v14M6 13l6 6 6-6"/></svg>
+              저장하면 바로 반영돼요
+            </div>
+            <div class="card sq-stack" style="--sd:340ms"><div class="p-line"><span class="t">2026-08-21</span><span class="v m">-605,000원</span></div></div>
+            <div class="card sq-stack" style="--sd:400ms"><div class="p-line"><span class="t">2026-09-21</span><span class="v m">-605,000원</span></div></div>
+            <div class="card sq-stack" style="--sd:470ms"><div class="p-line"><span class="t">2026-10-21</span><span class="v m">-605,000원</span></div></div>
+            <div class="card sq-stack" style="--sd:600ms;--fo:.45"><div class="p-line"><span class="t">2026-11-21</span><span class="v m">-605,000원</span></div></div>
+            <div class="p-foot">20건 등록됨</div>
+          </div>
         </div>
 
         <!-- 03 계산기 -->
         <div class="paper" data-seq="2000">
-          <div class="p-head"><span>CALCULATOR</span><span>금액 입력</span></div>
-          <div class="p-label">수식</div>
-          <div class="p-expr">3,900 × 5<span class="mask sq-type"></span></div>
-          <hr class="perf">
-          <div class="sq-res">
-            <div class="p-label">적용될 금액</div>
-            <div class="p-big m">-19,500<span class="won">원</span></div>
+          <div class="p-top">
+            <div class="t">금액 계산</div>
+            <div class="s">계산한 금액을 바로 적용해요</div>
           </div>
-          <div class="p-foot">금액에 적용</div>
+          <div class="p-body">
+            <div class="p-field">
+              <div class="p-expr">3,900 × 5<span class="mask sq-type"></span></div>
+              <div class="p-res sq-res">19,500원</div>
+            </div>
+            <div class="p-keys">
+              <i class="op">C</i><i class="op">⌫</i><i class="op">÷</i><i class="op">×</i>
+              <i>7</i><i>8</i><i>9</i><i class="op">−</i>
+              <i>4</i><i>5</i><i>6</i><i class="op">+</i>
+              <i>1</i><i>2</i><i>3</i><i class="eq">=</i>
+            </div>
+            <div class="p-apply">금액에 적용</div>
+          </div>
         </div>
 
         <!-- 04 캘린더 -->
         <div class="paper" data-seq="2200">
-          <div class="p-head"><span>2026.08</span><span>-697,942원</span></div>
-          <div class="p-seg"><span class="knob sq-knob"></span><span>리스트</span><span>캘린더</span></div>
-          <div class="p-cal">
-            <div class="dw">일</div><div class="dw">월</div><div class="dw">화</div><div class="dw">수</div><div class="dw">목</div><div class="dw">금</div><div class="dw">토</div>
-            <div class="cell sq-cal" style="--sd:300ms">2</div>
-            <div class="cell sq-cal" style="--sd:300ms">3<em class="m">-73,442</em></div>
-            <div class="cell sq-cal" style="--sd:300ms">4<em class="m">-19,500</em></div>
-            <div class="cell on sq-cal" style="--sd:300ms">5</div>
-            <div class="cell sq-cal" style="--sd:300ms">6</div>
-            <div class="cell sq-cal" style="--sd:300ms">7</div>
-            <div class="cell sq-cal" style="--sd:300ms">8</div>
-            <div class="cell sq-cal" style="--sd:420ms">16</div>
-            <div class="cell sq-cal" style="--sd:420ms">17</div>
-            <div class="cell sq-cal" style="--sd:420ms">18</div>
-            <div class="cell sq-cal" style="--sd:420ms">19</div>
-            <div class="cell sq-cal" style="--sd:420ms">20</div>
-            <div class="cell sq-cal" style="--sd:420ms">21<em class="m">-605,000</em></div>
-            <div class="cell sq-cal" style="--sd:420ms">22</div>
-            <div class="cell sq-cal" style="--sd:540ms">23</div>
-            <div class="cell sq-cal" style="--sd:540ms">24</div>
-            <div class="cell sq-cal" style="--sd:540ms">25<em class="p">+4,007,324</em></div>
-            <div class="cell sq-cal" style="--sd:540ms">26</div>
-            <div class="cell sq-cal" style="--sd:540ms">27</div>
-            <div class="cell sq-cal" style="--sd:540ms">28</div>
-            <div class="cell sq-cal" style="--sd:540ms">29<em class="m">-11,900</em></div>
+          <div class="p-top">
+            <div class="t">가계부</div>
+            <div class="s">2026년 8월</div>
+          </div>
+          <div class="p-body">
+            <div class="p-seg"><span class="knob sq-knob"></span><span>리스트</span><span>캘린더</span></div>
+            <dl class="p-sum">
+              <div><dt>이번 달</dt><dd class="num">-697,942원</dd></div>
+              <div><dt>수입</dt><dd class="p">+0원</dd></div>
+              <div><dt>지출</dt><dd class="m">-697,942원</dd></div>
+            </dl>
+            <div class="p-cal">
+              <div class="dw">일</div><div class="dw">월</div><div class="dw">화</div><div class="dw">수</div><div class="dw">목</div><div class="dw">금</div><div class="dw">토</div>
+              <div class="cell sq-cal" style="--sd:300ms">2</div>
+              <div class="cell sq-cal" style="--sd:300ms">3<em class="m">-73,442</em></div>
+              <div class="cell sq-cal" style="--sd:300ms">4<em class="m">-19,500</em></div>
+              <div class="cell on sq-cal" style="--sd:300ms">5</div>
+              <div class="cell sq-cal" style="--sd:300ms">6</div>
+              <div class="cell sq-cal" style="--sd:300ms">7</div>
+              <div class="cell sq-cal" style="--sd:300ms">8</div>
+              <div class="cell sq-cal" style="--sd:430ms">16</div>
+              <div class="cell sq-cal" style="--sd:430ms">17</div>
+              <div class="cell sq-cal" style="--sd:430ms">18</div>
+              <div class="cell sq-cal" style="--sd:430ms">19</div>
+              <div class="cell sq-cal" style="--sd:430ms">20</div>
+              <div class="cell sq-cal" style="--sd:430ms">21<em class="m">-605,000</em></div>
+              <div class="cell sq-cal" style="--sd:430ms">22</div>
+            </div>
           </div>
         </div>
 
         <!-- 05 동기화 -->
         <div class="paper" data-seq="2400">
-          <div class="p-head"><span>SYNC</span><span>17:38 완료</span></div>
-          <div class="p-sync" style="position:relative">
-            <div class="dev"><b class="hi"></b><b></b><b></b></div>
-            <span class="arc"></span>
-            <span class="cl">
-              <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round"><path d="M17.5 19a4.5 4.5 0 0 0 0-9 6 6 0 0 0-11.6 1.5A3.5 3.5 0 0 0 6.5 19z"/></svg>
-            </span>
-            <span class="arc"></span>
-            <div class="dev"><b class="hi sq-recv"></b><b></b><b></b></div>
-            <span class="sq-tok" style="position:absolute;left:44px;bottom:26px;width:6px;height:6px;border-radius:50%;background:var(--accent)"></span>
+          <div class="p-top">
+            <div class="t">V-Flux</div>
+            <div class="s">당신의 자산, 더 똑똑하게 흐르게</div>
           </div>
-          <hr class="perf">
-          <div class="p-line" style="padding-bottom:0">
-            <span class="t">커피<i>이 기기에서 기록</i></span>
-            <span class="v m">-4,500원</span>
+          <div class="p-body">
+            <div class="p-sync">
+              <div class="dev"><b class="hi"></b><b></b><b></b></div>
+              <span class="arc"></span>
+              <span class="cl">
+                <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round"><path d="M17.5 19a4.5 4.5 0 0 0 0-9 6 6 0 0 0-11.6 1.5A3.5 3.5 0 0 0 6.5 19z"/></svg>
+              </span>
+              <span class="arc"></span>
+              <div class="dev"><b class="hi sq-recv"></b><b></b><b></b></div>
+              <span class="sq-tok" style="position:absolute;left:64px;bottom:30px;width:6px;height:6px;border-radius:50%;background:var(--accent)"></span>
+            </div>
+            <div class="flowline" style="justify-content:center">Google 계정으로 자동 백업</div>
+            <div class="card">
+              <div class="p-line">
+                <span class="tag out">지출</span>
+                <span class="t">커피<i>이 기기에서 기록</i></span>
+                <span class="v m">-4,500원</span>
+              </div>
+            </div>
+            <div class="card sq-recv">
+              <div class="p-line">
+                <span class="tag out">지출</span>
+                <span class="t">커피<i>다른 기기에도 도착</i></span>
+                <span class="v m">-4,500원</span>
+              </div>
+            </div>
           </div>
-          <div class="p-line sq-recv">
-            <span class="t">커피<i>다른 기기에 도착</i></span>
-            <span class="v m">-4,500원</span>
-          </div>
-          <div class="p-foot">Google 계정 백업</div>
         </div>
 
         <!-- 06 개인정보 -->
         <div class="paper" data-seq="2200">
-          <div class="p-head"><span>PRIVACY</span><span>온디바이스</span></div>
-          <div class="p-label">수신한 문자</div>
-          <div style="font-size:11px;line-height:1.9;color:rgba(23,22,28,.7)">
-            <span class="p-redact">[Web발신] 신한카드(1234)<span class="bar sq-redact" style="--sd:280ms"></span></span><br>
-            <span class="p-redact">고현서님 4,500원 일시불<span class="bar sq-redact" style="--sd:400ms"></span></span><br>
-            <span class="p-redact">누적 1,787,143원 스타벅스<span class="bar sq-redact" style="--sd:520ms"></span></span>
+          <div class="p-top">
+            <div class="bc">가계부 &gt; 자동입력</div>
+            <div class="t">카드·은행 자동입력</div>
+            <div class="s">카드 승인과 연관 은행의 알림을 감지해요</div>
           </div>
-          <hr class="perf">
-          <div class="sq-lock">
-            <div class="p-label">남는 것</div>
-            <div class="p-line" style="padding-top:2px">
-              <span class="t">금액 · 사용처 · 일시</span>
-              <span class="v m">-4,500원</span>
+          <div class="p-body">
+            <div class="p-label">받은 문자에서</div>
+            <div style="color:rgba(23,22,28,.7)">
+              <span class="p-redact">[Web발신] 신한카드(1234)<span class="bar sq-redact" style="--sd:280ms"></span></span><br>
+              <span class="p-redact">고현서님 4,500원 일시불<span class="bar sq-redact" style="--sd:400ms"></span></span><br>
+              <span class="p-redact">누적 1,787,143원 스타벅스<span class="bar sq-redact" style="--sd:520ms"></span></span>
+            </div>
+            <div class="flowline sq-lock" style="margin-top:12px">금액 · 사용처 · 일시만 남겨요</div>
+            <div class="p-toggle sq-lock">
+              <span>카드·은행 거래 문자<small class="ok">문자 원문은 저장하지 않아요</small></span>
+              <span class="p-allow">허용됨</span>
+            </div>
+            <div class="p-toggle">
+              <span>신한카드<small class="ok">앱 설치됨 · 카드·연관 은행 문자 감지</small></span>
+              <span class="p-sw"><i></i></span>
+            </div>
+            <div class="p-toggle">
+              <span>KB국민카드<small class="no">앱 미설치</small></span>
+              <span class="p-sw off"><i></i></span>
             </div>
           </div>
-          <hr class="perf">
-          <div class="p-toggle"><span>신한카드</span><span class="p-sw"><i></i></span></div>
-          <div class="p-toggle" style="opacity:.5"><span>KB국민카드</span><span class="p-sw off"><i></i></span></div>
         </div>
 
       </div>

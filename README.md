@@ -2,11 +2,19 @@
 
 > **당신의 자산, 더 똑똑하게 흐르게** — .NET MAUI 기반 자산 운용(가계부) 애플리케이션 V-Flux의 소개 페이지입니다.
 
+### 👉 [https://kohyeonseo.github.io/V-Flux-page/](https://kohyeonseo.github.io/V-Flux-page/)
+
+이미지를 누르면 실제 페이지로 이동합니다.
+
+[![V-Flux 소개 페이지 - 히어로](preview-hero.png)](https://kohyeonseo.github.io/V-Flux-page/)
+
+[![V-Flux 소개 페이지 - 주요 기능](preview-features.png)](https://kohyeonseo.github.io/V-Flux-page/#features)
+
 ## 링크
 
 | 구분 | 주소 |
 | --- | --- |
-| 라이브 페이지 | **https://kohyeonseo.github.io/V-Flux-page/** |
+| 라이브 페이지 | https://kohyeonseo.github.io/V-Flux-page/ |
 | 이 저장소 | https://github.com/KoHyeonSeo/V-Flux-page |
 
 ## 이 저장소는
@@ -18,6 +26,7 @@ V-Flux 앱의 소개 페이지 **한 장**만 담고 있습니다. 앱 소스 �
 | --- | --- |
 | `index.html` | 소개 페이지 전체 (HTML · CSS · JS 단일 파일) |
 | `vflux-logo-64.png` | 파비콘 |
+| `preview-*.png` | README용 미리보기 이미지 |
 
 ## 페이지 구성
 
@@ -25,6 +34,8 @@ V-Flux 앱의 소개 페이지 **한 장**만 담고 있습니다. 앱 소스 �
 - **주요 기능** — 다섯 가지 기능을 눌러 실제 앱 화면으로 확인하는 인터랙티브 쇼케이스
   - 카드 자동입력 · 반복 등록 · 금액 계산 · 캘린더 보기 · 기기 동기화
 - **시작 가이드** — 로그인부터 흐름 확인까지 세 단계
+
+> 위 이미지는 정지 화면입니다. 탭을 눌러 화면이 전환되는 인터랙션은 라이브 페이지에서 확인하세요.
 
 ## 기술 메모
 

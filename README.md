@@ -15,7 +15,6 @@
 | 구분 | 주소 |
 | --- | --- |
 | 라이브 페이지 | https://kohyeonseo.github.io/V-Flux-page/ |
-| 이 저장소 | https://github.com/KoHyeonSeo/V-Flux-page |
 
 ## 이 저장소는
 

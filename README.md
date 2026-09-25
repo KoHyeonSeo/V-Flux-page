@@ -1,6 +1,8 @@
 # V-Flux 소개 페이지
 
-> **당신의 자산, 더 똑똑하게 흐르게** — .NET MAUI 기반 자산 운용(가계부) 애플리케이션 V-Flux의 소개 페이지입니다.
+> **당신의 자산, 더 똑똑하게 흐르게** — .NET MAUI 기반 자산 운용(가계부) 애플리케이션 V-Flux의 소개 페이지입니다. Android 버전은 Google Play에서 정식 출시되었습니다.
+
+[Google Play에서 V-Flux 가계부 설치하기](https://play.google.com/store/apps/details?id=com.kokohyeonseo.vflux.financial)
 
 <a href="https://kohyeonseo.github.io/V-Flux-page/">
   <img src="btn-live.png" alt="소개 페이지 열기 — https://kohyeonseo.github.io/V-Flux-page/" width="340">
@@ -17,6 +19,7 @@
 | 구분 | 주소 |
 | --- | --- |
 | 라이브 페이지 | https://kohyeonseo.github.io/V-Flux-page/ |
+| Android 앱 | https://play.google.com/store/apps/details?id=com.kokohyeonseo.vflux.financial |
 
 ## 이 저장소는
 

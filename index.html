@@ -3,11 +3,11 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
-<meta name="description" content="카드 결제는 자동으로 기록하고, 필요한 내역만 직접 다듬는 V-Flux 가계부를 Google Play에서 만나보세요.">
+<meta name="description" content="카드 결제와 영수증 사진에서 지출을 자동으로 기록하는 V-Flux 가계부를 Google Play에서 만나보세요.">
 <meta name="theme-color" content="#15131C">
 <meta property="og:type" content="website">
 <meta property="og:title" content="V-Flux | 자동으로 채워지는 가계부">
-<meta property="og:description" content="카드 결제는 자동으로 기록하고, 필요한 내역만 직접 다듬어 한 달의 흐름을 확인하세요. Android에서 지금 이용할 수 있습니다.">
+<meta property="og:description" content="카드 결제 문자와 영수증 사진에서 지출을 자동으로 기록하고 한 달의 흐름을 확인하세요. Android에서 지금 이용할 수 있습니다.">
 <meta property="og:url" content="https://kohyeonseo.github.io/V-Flux-page/">
 <meta property="og:image" content="https://kohyeonseo.github.io/V-Flux-page/preview-hero.png">
 <link rel="canonical" href="https://kohyeonseo.github.io/V-Flux-page/">
@@ -606,6 +606,7 @@ section { padding: var(--pad) 0; }
 }
 .paper {
   grid-area: 1 / 1;
+  align-self: center;
   width: min(376px, 100%);
   background: var(--app-canvas);
   color: var(--ink);
@@ -633,6 +634,15 @@ section { padding: var(--pad) 0; }
     opacity var(--d-out) var(--ease-in),
     transform var(--d-out) var(--ease-in),
     visibility 0s linear var(--d-out);
+}
+.receipt-paper {
+  width: min(300px, 100%);
+  background: transparent;
+}
+.receipt-paper img {
+  display: block;
+  width: 100%;
+  height: auto;
 }
 /* 앱 상단 바 */
 .p-top {
@@ -1040,6 +1050,7 @@ footer {
 @media (max-width: 560px) {
   .fx-nav { margin-inline: -24px; }
   .paper { padding: 18px 16px 22px; }
+  .receipt-paper { padding: 0; }
 }
 @media (max-width: 980px) {
   .hero { padding-top: 104px; padding-bottom: 72px; }
@@ -1217,7 +1228,10 @@ footer {
     </div>
 
     <div class="fx-nav reveal" role="tablist" aria-label="주요 기능">
-      <button class="fx-tab" role="tab" id="t0" aria-controls="p0" aria-selected="true" tabindex="0">
+      <button class="fx-tab" role="tab" id="t-receipt" aria-controls="p-receipt" aria-selected="true" tabindex="0">
+        <span class="nm">영수증 인식</span>
+      </button>
+      <button class="fx-tab" role="tab" id="t0" aria-controls="p0" aria-selected="false" tabindex="-1">
         <span class="nm">카드 자동입력</span>
       </button>
       <button class="fx-tab" role="tab" id="t1" aria-controls="p1" aria-selected="false" tabindex="-1">
@@ -1238,7 +1252,12 @@ footer {
     <div class="fx-stage reveal" style="--d:80ms">
       <!-- 설명 -->
       <div class="fx-copy">
-        <div class="fx-txt is-in" role="tabpanel" id="p0" aria-labelledby="t0" tabindex="0">
+        <div class="fx-txt is-in" role="tabpanel" id="p-receipt" aria-labelledby="t-receipt" tabindex="0">
+          <h3>영수증 한 장이면,<br>지출 기록이 끝나요</h3>
+          <p>영수증을 촬영하거나 갤러리에서 첨부하면 결제 금액, 사용처, 날짜를 자동으로 읽어요. 인식 결과를 확인하고 저장하면 지출 등록이 끝나요.</p>
+          <span class="meta">사진과 OCR 원문은 서버에 저장하지 않아요. 흐린 영수증은 저장 전에 내용을 확인해 주세요.</span>
+        </div>
+        <div class="fx-txt" role="tabpanel" id="p0" aria-labelledby="t0" tabindex="0" hidden>
           <h3>카드 쓰면<br>가계부에 알아서 올라와요</h3>
           <p>결제 문자가 오면 금액과 사용처를 읽어 바로 내역으로 만들어요. 현금처럼 문자가 없는 지출은 직접 추가하고, 올라온 내역도 언제든 고칠 수 있어요.</p>
           <span class="meta">국내 9개 카드사와 연관 은행 지원</span>
@@ -1268,8 +1287,20 @@ footer {
       <!-- 앱 화면 미리보기 -->
       <div class="fx-papers" aria-hidden="true">
 
-        <!-- 01 자동입력 -->
-        <div class="paper is-in" data-seq="2600">
+        <!-- 01 영수증 인식 -->
+        <div class="paper receipt-paper is-in">
+          <img
+            src="vflux-receipt-scan.png"
+            width="1080"
+            height="1920"
+            loading="lazy"
+            decoding="async"
+            alt=""
+          >
+        </div>
+
+        <!-- 02 자동입력 -->
+        <div class="paper" data-seq="2600">
           <div class="p-top">
             <div class="t">가계부</div>
             <div class="s">수입/지출을 한눈에 확인하고 빠르게 기록하세요</div>
@@ -1311,7 +1342,7 @@ footer {
           </div>
         </div>
 
-        <!-- 02 반복 -->
+        <!-- 03 반복 -->
         <div class="paper" data-seq="2400">
           <div class="p-top">
             <div class="bc">가계부 &gt; 반복 관리</div>
@@ -1338,7 +1369,7 @@ footer {
           </div>
         </div>
 
-        <!-- 03 계산기 -->
+        <!-- 04 계산기 -->
         <div class="paper" data-seq="2000">
           <div class="p-top">
             <div class="t">금액 계산</div>
@@ -1360,7 +1391,7 @@ footer {
           </div>
         </div>
 
-        <!-- 04 캘린더 -->
+        <!-- 05 캘린더 -->
         <div class="paper" data-seq="2200">
           <div class="p-top">
             <div class="t">가계부</div>
@@ -1393,7 +1424,7 @@ footer {
           </div>
         </div>
 
-        <!-- 05 동기화 -->
+        <!-- 06 동기화 -->
         <div class="paper" data-seq="2400">
           <div class="p-top" style="display:flex;align-items:center;gap:11px">
             <span class="logo-mark" style="width:34px;height:34px" aria-hidden="true"></span>
